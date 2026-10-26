@@ -25,10 +25,12 @@ const navigation: NavigationItem[] = [
 ];
 
 function SectionHeading({
+  id,
   title,
   description,
   icon: Icon,
 }: {
+  id?: string;
   title: string;
   description?: string;
   icon?: typeof BookOpen;
@@ -36,7 +38,7 @@ function SectionHeading({
   return (
     <div className="section-heading">
       <div>
-        <h2>{title}</h2>
+        <h2 id={id}>{title}</h2>
         {description ? <p>{description}</p> : null}
       </div>
       {Icon ? (
@@ -104,6 +106,7 @@ export default function App() {
 
         <section className="today-section" aria-labelledby="today-title">
           <SectionHeading
+            id="today-title"
             title="Wiersz na dziś"
             description="Jedno nagranie, któremu możesz poświęcić chwilę."
             icon={Sparkles}
@@ -147,11 +150,12 @@ export default function App() {
 
         <section className="collection-section" aria-labelledby="poets-title">
           <SectionHeading
+            id="poets-title"
             title="Poeci"
             description="Poznaj ludzi i słowa stojące za utworami."
             icon={BookOpen}
           />
-          <div id="poets-title" className="collection-placeholder">
+          <div className="collection-placeholder">
             <EmptyCollection>
               Katalog poetów pojawi się, gdy dostępne będą dane twórców.
             </EmptyCollection>
@@ -160,11 +164,12 @@ export default function App() {
 
         <section className="collection-section" aria-labelledby="artists-title">
           <SectionHeading
+            id="artists-title"
             title="Artyści"
             description="Odkrywaj różne głosy i interpretacje."
             icon={UsersRound}
           />
-          <div id="artists-title" className="collection-placeholder">
+          <div className="collection-placeholder">
             <EmptyCollection>
               Katalog artystów pojawi się po podłączeniu biblioteki nagrań.
             </EmptyCollection>
@@ -173,11 +178,12 @@ export default function App() {
 
         <section className="collection-section recommended-section" aria-labelledby="recommended-title">
           <SectionHeading
+            id="recommended-title"
             title="Wybrane dla Ciebie"
             description="Miejsce na kolejne odkrycia."
             icon={Heart}
           />
-          <div id="recommended-title" className="collection-placeholder">
+          <div className="collection-placeholder">
             <EmptyCollection>
               Ta sekcja zostanie wypełniona na podstawie rzeczywistych materiałów.
             </EmptyCollection>
