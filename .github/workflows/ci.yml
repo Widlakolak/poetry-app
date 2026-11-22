@@ -10,12 +10,25 @@ on:
       - "frontend/**"
       - ".github/workflows/ci.yml"
       - ".github/workflows/publish-images.yml"
+      - "compose.yaml"
+      - ".env.example"
+      - "README.md"
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
+  compose-config:
+    name: Validate deployment Compose configuration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Validate Compose configuration
+        run: docker compose --env-file .env.example -f compose.yaml config --quiet
+
   frontend-build:
     name: Frontend production build
     runs-on: ubuntu-latest
