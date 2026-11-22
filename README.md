@@ -105,3 +105,48 @@ Opisane funkcje i etapy rozwoju przedstawiają założenia projektu, a nie dekla
 Poetry App ma rozwijać się jako cyfrowa przestrzeń łącząca literaturę, interpretację aktorską i edukację. Jej dalszy rozwój może obejmować współpracę z twórcami, bibliotekami, szkołami i instytucjami kultury.
 
 Najważniejszym celem pozostaje stworzenie prostego narzędzia, które pozwala skupić się na poezji i ułatwia kontakt z literaturą w codziennym życiu.
+
+
+## Deployment (QNAP)
+
+The deployment uses a separate Compose project and the existing Docker network shared with the current Nginx and Cloudflare Tunnel. It does not define another reverse proxy, tunnel, or host port mapping.
+
+### Files on the NAS
+
+Keep the deployment files in:
+
+`/share/CACHEDEV1_DATA/Container/poetryapp`
+
+The Compose file uses a relative bind mount for PostgreSQL data, so the persistent database directory is:
+
+`/share/CACHEDEV1_DATA/Container/poetryapp/postgres-data`
+
+Media and import directories are not mounted into these containers at this stage. The current backend does not implement media streaming or import processing.
+
+### Initial configuration
+
+1. Copy `.env.example` to `.env`.
+2. Set a long random `POSTGRES_PASSWORD`. Do not commit `.env` or share its contents.
+3. Keep `CORS_ALLOWED_ORIGINS` aligned with the public origin configured later in the shared Nginx/Cloudflare setup.
+4. Ensure the existing Docker network `poetrystream_shared-net` exists before starting this Compose project.
+
+### Validate and start
+
+Run these commands from the Poetry App deployment directory:
+
+```sh
+docker compose --env-file .env -f compose.yaml config
+docker compose --env-file .env -f compose.yaml pull
+docker compose --env-file .env -f compose.yaml up -d
+docker compose --env-file .env -f compose.yaml ps
+```
+
+The PostgreSQL service is reachable only on the private Compose database network. The backend joins that network and the existing shared network; the frontend joins only the shared network. No service publishes a host port.
+
+The images are published to GitHub Container Registry by the workflow after changes are merged to `main`. If the packages are private, authenticate the NAS Docker client to `ghcr.io` with a GitHub token that has `read:packages` permission before pulling.
+
+### Important deployment boundary
+
+This Compose project does not change the existing Nginx configuration, Cloudflare Tunnel routes, PoetryStream, or WorkDone. Public routing must be prepared as a separate, reviewed step. In particular, the existing WorkDone Discord interaction endpoint must remain reachable when its hostname is reused for the Poetry App frontend.
+
+Do not run `docker compose down -v` on this project; the PostgreSQL volume contains persistent application data.
