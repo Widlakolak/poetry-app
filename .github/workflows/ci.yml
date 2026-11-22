@@ -9,6 +9,7 @@ on:
       - "backend/**"
       - "frontend/**"
       - ".github/workflows/ci.yml"
+      - ".github/workflows/publish-images.yml"
   workflow_dispatch:
 
 permissions:
@@ -35,8 +36,11 @@ jobs:
         working-directory: frontend
         run: npm run build
 
+      - name: Build frontend container image
+        run: docker build --pull -t poetry-app-frontend:ci ./frontend
+
   backend-test:
-    name: Backend tests
+    name: Backend tests and container build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -54,3 +58,6 @@ jobs:
       - name: Run backend tests
         working-directory: backend
         run: ./gradlew test
+
+      - name: Build backend container image
+        run: docker build --pull -t poetry-app-backend:ci ./backend
