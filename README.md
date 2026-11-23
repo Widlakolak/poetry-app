@@ -314,3 +314,70 @@ Manually verify on `https://workdone.qzz.io/`:
 
 Only the frontend and README change. No new backend, database, Nginx,
 Cloudflare Tunnel, Compose, or Docker mount configuration is required.
+
+
+### Stage 9: Import and play local MP3 audio
+
+The existing one-off importer now accepts **MP3** files in addition to MP4.
+It identifies the format by the source extension and performs a lightweight
+MP3/MPEG Layer III frame-header check, including files beginning with an
+ID3v2 tag. It still validates paths and file limits, copies in small chunks,
+calculates SHA-256, prevents duplicate records, and preserves the original
+file in read-only `incoming`. New MP3 objects use UUID storage keys with
+`.mp3`, `AUDIO / LOCAL_FILE`, and `audio/mpeg` metadata.
+
+The existing `GET /api/v1/media/{id}/stream` route supports published
+local MP3 files with `Content-Type: audio/mpeg` and byte ranges. Existing
+MP4 behavior stays unchanged. The frontend library now shows an audio Play
+button and native HTML5 audio controls; it does not fabricate artists,
+poets, titles or transcripts.
+
+**Do not import automatically.** First inspect the real MP3 files on QNAP,
+verify the desired title and permission to publish each recording, and
+then manually launch a one-off import. Provide the chosen file and display
+title as shell variables:
+
+```sh
+cd /share/CACHEDEV1_DATA/Container/poetryapp
+
+# Set these variables to the confirmed exact filename and display title.
+MP3_FILENAME='exact-filename.mp3'
+DISPLAY_TITLE='Confirmed recording title'
+
+docker compose --env-file .env -f compose.yaml run --rm --no-deps poetryapp-backend \
+  --spring.main.web-application-type=none \
+  "--app.import.filename=$MP3_FILENAME" \
+  "--app.import.title=$DISPLAY_TITLE"
+```
+
+The above values are illustrative and **must be replaced** after checking the
+source content; no automatic naming or bulk import is implemented.
+
+Deploy in this order after CI, merge and successful GHCR image publishing:
+
+```sh
+cd /share/CACHEDEV1_DATA/Container/poetryapp
+docker compose --env-file .env -f compose.yaml pull poetryapp-backend poetryapp-frontend
+docker compose --env-file .env -f compose.yaml up -d --no-deps poetryapp-backend poetryapp-frontend
+docker compose --env-file .env -f compose.yaml ps
+```
+
+Once both services are ready, import one confirmed MP3 and check
+`GET /api/v1/media`. For the returned audio ID, test a small HTTP range
+request instead of fetching the full MP3:
+
+```sh
+curl -sS -o /dev/null -D - -H 'Range: bytes=0-1023' \
+  "https://workdone.qzz.io/api/v1/media/ACTUAL_AUDIO_UUID/stream"
+```
+
+Expected: `206 Partial Content`, `Content-Type: audio/mpeg`,
+`Accept-Ranges: bytes`. Finally verify audio play, pause, seeking and
+switching between audio and existing video in the **Biblioteka** tab. Recheck
+the home-screen MP4 player.
+
+The initial MP3 validation is not a full audio decoder. Files with
+unusual tag padding or unsupported frame headers may require inspection
+rather than forced import. WAV, YouTube and automatic folder scanning are
+not included. No new migrations, mounts, services or routing changes are
+required; do not change QNAP permissions or use `docker compose down -v`.
