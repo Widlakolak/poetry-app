@@ -45,3 +45,13 @@ The production profile deliberately has no fallback database credentials.
 - `GET /actuator/health` - health probe
 
 The API does not expose filesystem paths or implement media streaming. Write endpoints, importing, search and playback are outside this stage.
+
+## Local media import (Stage 5)
+
+An opt-in, command-line-only importer copies a single MP4 from the configured
+incoming directory into durable storage, writes SHA-256 and file metadata,
+and publishes the catalog entry. It does not serve the media file yet.
+Run as a one-off container with `--spring.main.web-application-type=none` and
+`--app.import.filename=...` plus `--app.import.title=...`. The command is
+inactive during ordinary server startup. See the root README for the exact
+QNAP command and mount paths.

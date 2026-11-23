@@ -21,6 +21,10 @@ spring:
 app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS}
+  media:
+    max-file-size-bytes: ${MEDIA_MAX_FILE_SIZE_BYTES:2147483648}
+    incoming-dir: /data/incoming
+    storage-dir: /data/media
 
 management:
   endpoints:

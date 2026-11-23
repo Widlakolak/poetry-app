@@ -119,4 +119,9 @@ public class MediaItem {
     public PublicationStatus getPublicationStatus() { return publicationStatus; }
     public TranscriptStatus getTranscriptStatus() { return transcriptStatus; }
     public Instant getPublishedAt() { return publishedAt; }
+
+    public void publish() {
+        this.publicationStatus = PublicationStatus.PUBLISHED;
+        this.publishedAt = Instant.now();
+    }
 }

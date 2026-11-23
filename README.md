@@ -150,3 +150,40 @@ The images are published to GitHub Container Registry by the workflow after chan
 This Compose project does not change the existing Nginx configuration, Cloudflare Tunnel routes, PoetryStream, or WorkDone. Public routing must be prepared as a separate, reviewed step. In particular, the existing WorkDone Discord interaction endpoint must remain reachable when its hostname is reused for the Poetry App frontend.
 
 Do not run `docker compose down -v` on this project; the PostgreSQL volume contains persistent application data.
+
+
+### Stage 5: import one local MP4 from QNAP
+
+The running backend uses two additional bind mounts:
+- `./incoming:/data/incoming:ro` — source files, never modified by the importer.
+- `./media:/data/media:rw` — persistent imported files (outside images and Git).
+
+The backend image runs as UID 100 / GID 101. Check host permissions and QNAP ACLs
+before deployment. Do not change directory ownership recursively. Initially, the
+configurable per-file safety limit is 2 GiB (`MEDIA_MAX_FILE_SIZE_BYTES`).
+The import copies in 64 KiB chunks, not into heap memory.
+
+After merging this stage, pulling published images, and reviewing the Compose diff:
+
+```sh
+cd /share/CACHEDEV1_DATA/Container/poetryapp
+docker compose --env-file .env -f compose.yaml config --quiet
+docker compose --env-file .env -f compose.yaml pull
+docker compose --env-file .env -f compose.yaml up -d
+docker compose --env-file .env -f compose.yaml run --rm --no-deps poetryapp-backend \
+  --spring.main.web-application-type=none \
+  "--app.import.filename=Bialoszewski Sen Peszek.mp4" \
+  "--app.import.title=Białoszewski - Sen Peszek"
+```
+
+The database must already be running and healthy. The command adds a published
+catalog entry and copies the source MP4 into `media`, using a random storage key;
+it never deletes the original `incoming` file. Check the result using
+`GET /api/v1/media`. SHA-256 uniqueness keeps retries idempotent. Only files
+with an MP4 `ftyp` header are accepted in this stage; the actual codecs and
+playback are validated in the streaming stage, not assumed by the importer.
+
+**Boundaries:** there is no public import endpoint, no video playback/Range
+endpoint yet, no media directory exposed by Nginx, and no automatic scanning.
+Do not run the command until the PR has passed CI, been merged, and the new
+backend image has been published and deployed. Do not use `docker compose down -v`.
