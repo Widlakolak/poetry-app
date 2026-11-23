@@ -122,10 +122,11 @@ rekordów):
   ładowania, pustej listy i błędu API oraz poprawne zachowanie przy
   jednym kafelku.
 
-**Status: planowane, jeszcze niewdrożone.** Najpierw należy uruchomić
-dynamiczną sekcję **Artyści** na podstawie istniejącego API, a następnie
-wdrożyć poziome kafelki w osobnym PR z testami na telefonie i komputerze,
-bez przebudowy układu ekranu głównego ani zmian infrastruktury QNAP.
+**Status: poziome kafelki są nadal planowane i jeszcze niewdrożone.**
+Etap 16 podłącza dynamiczną sekcję **Artyści** do katalogu, bez wprowadzania
+karuzeli. Poziome kafelki wymagają osobnego etapu i testów na telefonie
+oraz komputerze, bez przebudowy układu ekranu głównego ani zmian
+infrastruktury QNAP.
 
 
 
@@ -740,3 +741,67 @@ browsers; YouTube's own player UI is under YouTube's control.
 
 No changes to PostgreSQL schema, backend image, Compose, shared Nginx,
 Cloudflare or other QNAP services in this stage.
+
+
+### Stage 16: Database-backed artists and credited recordings (not merged yet)
+
+The existing home **Artyści** section now fetches the real list of creators
+credited as `ARTIST` through `GET /api/v1/creators?role=ARTIST`.
+Artists are shown using the current simple creator row style, matching
+**Poeci**, with a profile link at `/artysci/{name-based-slug}`.
+
+To show an artist's actual recordings without guessing from their name or
+the media title, the backend adds the read-only endpoint:
+
+- `GET /api/v1/creators/{id}/media?role=ARTIST&page=0&size=20`
+
+It filters `media_credit.credit_role = ARTIST` and
+`media_item.publication_status = PUBLISHED`, is paginated (1–100 per page),
+sorts newest publication first, and returns the existing `MediaItemResponse`
+shape. Unknown creator UUIDs return 404; invalid/missing role and invalid
+pagination return 400. The same endpoint supports `role=POET` for future
+creator catalog work.
+
+The artist detail page shows the returned credited recordings and, where
+an existing published `literary_work` contains the corresponding media UUID,
+a link to that literary work. It links to the Biblioteka for playback.
+It does not invent biographies, portraits, titles, actor roles or transcripts.
+For the first confirmed data, `Anthony Hopkins` should appear at
+`/artysci/anthony-hopkins` with the previously linked T. S. Eliot YouTube
+reading. Artist and recording identifiers come from the API, not hardcoded
+into React.
+
+This stage does not introduce the planned horizontal/swipeable tiles;
+that remains a separately scoped UI stage recorded above. The existing
+home section order, **Wiersz na dziś** MP4 playback, YouTube recommendations,
+Biblioteka playback, and native `nodownload` UI settings remain unchanged.
+
+**Deployment after CI, merge, and a successful GHCR publish:**
+the backend must be updated **before** the frontend because the new profile
+uses the newly added endpoint. No Flyway migrations or data writes:
+
+```sh
+cd /share/CACHEDEV1_DATA/Container/poetryapp || exit 1
+
+docker compose --env-file .env -f compose.yaml pull poetryapp-backend || exit 1
+docker compose --env-file .env -f compose.yaml up -d --no-deps poetryapp-backend || exit 1
+docker compose --env-file .env -f compose.yaml ps
+
+# After backend startup:
+curl -fsS "https://workdone.qzz.io/api/v1/creators?role=ARTIST"
+curl -fsS "https://workdone.qzz.io/api/v1/creators/c1419f4f-6c15-4a7b-8005-049a84a14208/media?role=ARTIST"
+
+docker compose --env-file .env -f compose.yaml pull poetryapp-frontend || exit 1
+docker compose --env-file .env -f compose.yaml up -d --no-deps poetryapp-frontend || exit 1
+docker compose --env-file .env -f compose.yaml ps
+```
+
+Manual verification: the home **Artyści** section shows Anthony Hopkins
+from API, `/artysci/anthony-hopkins` lists his published YouTube reading
+and links to the T. S. Eliot work, while other authors and existing audio/video
+players keep working. A creator without a credited published recording
+must not show any unrelated media. Browser refresh on an artist URL should
+load normally.
+
+All changes remain inside Poetry App: no file import, database changes,
+QNAP mounts, Nginx, Cloudflare, PoetryStream or WorkDone service changes.
