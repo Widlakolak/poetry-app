@@ -4,11 +4,11 @@ import {
   Heart,
   House,
   LibraryBig,
-  Play,
   Search,
   Sparkles,
   UsersRound,
 } from "lucide-react";
+import FeaturedVideoCard from "./FeaturedVideoCard";
 
 type NavigationItem = {
   label: string;
@@ -111,41 +111,7 @@ export default function App() {
             description="Jedno nagranie, któremu możesz poświęcić chwilę."
             icon={Sparkles}
           />
-          <article className="featured-card">
-            <div className="featured-artwork">
-              <div className="artwork-grain" aria-hidden="true" />
-              <span className="artwork-kicker">INTERPRETACJA POETYCKA</span>
-              <div className="artwork-title">
-                <span>Miron</span>
-                <span>Białoszewski</span>
-              </div>
-              <span className="artwork-work">Sen Peszek</span>
-              <span className="artwork-line" aria-hidden="true" />
-              <button
-                className="play-button"
-                type="button"
-                disabled
-                aria-label="Odtwarzacz będzie dostępny po podłączeniu biblioteki materiałów"
-                title="Odtwarzanie zostanie podłączone w kolejnym etapie"
-              >
-                <Play size={22} fill="currentColor" strokeWidth={1.5} />
-              </button>
-              <span className="artwork-status">MATERIAŁ OCZEKUJE NA IMPORT</span>
-            </div>
-            <div className="featured-details">
-              <div>
-                <p className="content-kicker">NAGRANIE WIDEO</p>
-                <h3>Białoszewski - Sen Peszek</h3>
-                <p className="featured-caption">
-                  Plik źródłowy: <code>Bialoszewski Sen Peszek.mp4</code>
-                </p>
-              </div>
-              <span className="media-type">MP4</span>
-            </div>
-          </article>
-          <p className="section-note">
-            Odtwarzanie uruchomimy po podłączeniu importu i biblioteki multimediów.
-          </p>
+          <FeaturedVideoCard />
         </section>
 
         <section className="collection-section" aria-labelledby="poets-title">
