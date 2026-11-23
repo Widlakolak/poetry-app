@@ -392,3 +392,53 @@ unusual tag padding or unsupported frame headers may require inspection
 rather than forced import. WAV, YouTube and automatic folder scanning are
 not included. No new migrations, mounts, services or routing changes are
 required; do not change QNAP permissions or use `docker compose down -v`.
+
+
+### Stage 10: First verified poet and work detail pages (frontend only)
+
+The home-screen section order stays unchanged. The existing **Poeci** section
+now links to an editorial page for Miron Białoszewski:
+
+- `/poeci/miron-bialoszewski` — short original biography, context, bibliography and works;
+- `/utwory/odczepic-sie` — confirmed track 2, displayed in the API as `02 Track 02`;
+- `/utwory/siodma-osma` — confirmed track 12, displayed as `12 Track 12`.
+
+These two identifications were checked against the 75-track listing of
+`Białoszewski do słuchu, vol. 3 — Blok` and confirmed by the owner after
+listening. The profile and literary descriptions are original summaries
+based on Culture.pl and Zintegrowana Platforma Edukacyjna (ZPE).
+Each editorial page includes clickable source links and a clear statement
+that the recording's performer has not been independently verified.
+
+The **Biblioteka** view links the two known catalog entries to their
+respective work pages. Media IDs, storage keys, audio files, and creator
+credits are not hardcoded. Exact title matching is confined to the two
+confirmed legacy catalog titles; persistent author/creator-to-media
+relationships and editing tools remain a separate stage. No invented
+transcripts, photos, biographies or recording performers are introduced.
+
+The existing frontend Nginx config already supports SPA deep links via
+`try_files $uri $uri/ /index.html`. Navigation to
+`/biblioteka`, the poet profile, and the two work pages is therefore
+supported by direct URLs and browser refresh without changing shared Nginx
+or Cloudflare routing.
+
+After merging the combined PR and successful GHCR publication, update only
+`poetryapp-frontend` via the existing documented Compose command.
+Manually verify:
+1. All four home-screen sections stay in their original order.
+2. From **Poeci**, open Miron Białoszewski and both work pages.
+3. Use the work descriptions' source links and return to the poet page.
+4. From **Biblioteka**, open the corresponding work pages for tracks 02 and 12.
+5. Refresh each nested URL directly; then use the browser Back button.
+6. Audio/video playback still works in the library and on the home screen.
+7. Non-identified recordings are not attributed to a poet or performer.
+
+**Publication rights:** verified titles and literary facts do not grant
+permission to publicly stream commercially issued recordings or reproduce
+protected poems. Validate permissions before continuing public distribution.
+The separate future roadmap item for time-synchronized captions remains a
+plan, not an implemented feature.
+
+Only the frontend and README change in this stage; no database migration,
+backend endpoint, Docker mount, Compose, shared Nginx or Cloudflare change.
