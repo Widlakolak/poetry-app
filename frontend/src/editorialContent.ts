@@ -7,9 +7,6 @@ export type EditorialSource = {
 
 export type EditorialWork = {
   slug: string;
-  title: string;
-  recordingTitle: string;
-  previousRecordingTitle?: string;
   recordingDescription: string;
   about: string;
   context: string;
@@ -18,12 +15,9 @@ export type EditorialWork = {
 
 export const poet = {
   slug: "miron-bialoszewski",
-  name: "Miron Białoszewski",
   years: "1922–1983",
   introduction:
     "Polski poeta, prozaik i twórca teatru eksperymentalnego, silnie związany z Warszawą. W swojej twórczości badał rytm mowy codziennej, wieloznaczność słów i zwyczajne doświadczenia.",
-  biography:
-    "W 1956 roku opublikował debiutancki tom poetycki „Obroty rzeczy”. Współtworzył Teatr na Tarczyńskiej, a następnie Teatr Osobny. W prozie i poezji wracał do codzienności miasta oraz do możliwości języka mówionego.",
   context:
     "Po przeprowadzce na warszawską Lizbońską powstały utwory związane z blokowiskiem, przedstawionym między innymi w tomie „Odczepić się” (1978) i w „Chamowie”.",
   sources: [
@@ -46,9 +40,6 @@ const albumSource: EditorialSource = {
 export const works: EditorialWork[] = [
   {
     slug: "odczepic-sie",
-    title: "Odczepić się",
-    recordingTitle: "Odczepić się",
-    previousRecordingTitle: "02 Track 02",
     recordingDescription: "Ścieżka 2 z 75 na płycie „Białoszewski do słuchu”, vol. 3 — „Blok”.",
     about:
       "Krótka pozycja z archiwalnej kolekcji nagrań poświęconej twórczości Mirona Białoszewskiego. W spisie trzeciego woluminu albumu figuruje jako drugi utwór.",
@@ -64,9 +55,6 @@ export const works: EditorialWork[] = [
   },
   {
     slug: "siodma-osma",
-    title: "Siódma, ósma",
-    recordingTitle: "Siódma, ósma",
-    previousRecordingTitle: "12 Track 12",
     recordingDescription: "Ścieżka 12 z 75 na płycie „Białoszewski do słuchu”, vol. 3 — „Blok”; w spisie oznaczona jako fragment „Chamowa”.",
     about:
       "Wydawniczy spis utworów łączy „Siódma, ósma” z „Chamowem”, dziennikarsko-literackim zapisem codzienności autora po przeprowadzce na warszawską Lizbońską.",
@@ -81,10 +69,6 @@ export const works: EditorialWork[] = [
     ],
   },
 ];
-
-export function workForRecordingTitle(title: string): EditorialWork | undefined {
-  return works.find((work) => work.recordingTitle === title || work.previousRecordingTitle === title);
-}
 
 export function workForSlug(slug: string): EditorialWork | undefined {
   return works.find((work) => work.slug === slug);
