@@ -95,6 +95,40 @@ Napisy „w czasie rzeczywistym” oznaczają tutaj synchronizację z bieżącym
 
 Kolejne etapy będą zależały od rezultatów prac nad pierwszą wersją, potrzeb odbiorców oraz dostępnych zasobów.
 
+### Planowany etap UX — kafelki z przewijaniem poziomym
+
+W kolejnym, osobno zatwierdzanym etapie rozwoju interfejsu zmienić sposób
+prezentacji elementów w sekcjach strony głównej **Poeci**, **Artyści** oraz
+**Wybrane dla Ciebie** (i ewentualnych przyszłych sekcjach zawierających listy
+rekordów):
+
+- Zamiast zwykłej listy lub pojedynczego wiersza wyświetlać **kafelki (karty)**
+  ułożone w jednym poziomym rzędzie, tak aby było widać fragment kolejnej karty.
+- Umożliwić **przesuwanie lewo–prawo**: gestem przesunięcia na telefonach,
+  przewijaniem poziomym na komputerach oraz dostępnymi przyciskami
+  **poprzedni/następny**. Dodać obsługę klawiatury i czytelny stan fokusu.
+- Na kafelku prezentować wyłącznie dane dostępne w katalogu (np. nazwę
+  poety/artysty, tytuł materiału, rodzaj nagrania). Portrety, miniatury
+  i opisy pokazywać tylko wtedy, gdy istnieją prawdziwe dane i prawo do ich
+  użycia; w przeciwnym razie użyć prostego, neutralnego elementu graficznego.
+- Kliknięcie kafelka ma prowadzić do właściwej podstrony lub materiału;
+  **odtwarzanie na stronie głównej i w Bibliotece ma pozostać dostępne**.
+  Nie włączać automatycznego przesuwania ani samoczynnego odtwarzania.
+- Zachować kolejność sekcji **Wiersz na dziś → Poeci → Artyści →
+  Wybrane dla Ciebie**. Wyróżniona karta **Wiersz na dziś** pozostaje
+  osobnym dużym elementem z odtwarzaczem, a nie częścią karuzeli.
+- Dostosować szerokość kart i liczbę widocznych elementów do telefonu
+  i komputera, bez poziomego przewijania całej strony. Zapewnić stany
+  ładowania, pustej listy i błędu API oraz poprawne zachowanie przy
+  jednym kafelku.
+
+**Status: planowane, jeszcze niewdrożone.** Najpierw należy uruchomić
+dynamiczną sekcję **Artyści** na podstawie istniejącego API, a następnie
+wdrożyć poziome kafelki w osobnym PR z testami na telefonie i komputerze,
+bez przebudowy układu ekranu głównego ani zmian infrastruktury QNAP.
+
+
+
 ## Technologia i utrzymanie
 
 Projekt zakłada wykorzystanie otwartych i powszechnie stosowanych technologii, w tym Java, Spring Boot, React i TypeScript.
