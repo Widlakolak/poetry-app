@@ -73,11 +73,11 @@ export default function HorizontalCardRail({ labelledBy, label, items }: Horizon
       scrollOneCard(-1);
     } else if (event.key === "Home") {
       event.preventDefault();
-      trackRef.current?.scrollTo({ left: 0, behavior: "instant" });
+      trackRef.current?.scrollTo({ left: 0, behavior: "auto" });
     } else if (event.key === "End") {
       event.preventDefault();
       const track = trackRef.current;
-      if (track) track.scrollTo({ left: track.scrollWidth, behavior: "instant" });
+      if (track) track.scrollTo({ left: track.scrollWidth, behavior: "auto" });
     }
   }
 
