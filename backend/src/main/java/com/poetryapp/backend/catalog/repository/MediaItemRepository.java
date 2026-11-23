@@ -14,4 +14,6 @@ public interface MediaItemRepository extends JpaRepository<MediaItem, UUID> {
     Page<MediaItem> findAllByPublicationStatus(PublicationStatus status, Pageable pageable);
 
     Optional<MediaItem> findByIdAndPublicationStatus(UUID id, PublicationStatus status);
+
+    Optional<MediaItem> findBySha256(String sha256);
 }
