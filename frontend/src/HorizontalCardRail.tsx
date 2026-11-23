@@ -28,11 +28,17 @@ export default function HorizontalCardRail({ labelledBy, label, items }: Horizon
     function updatePosition() {
       if (!track) return;
       const maxScroll = Math.max(0, track.scrollWidth - track.clientWidth);
-      setPosition({
+      const nextPosition = {
         overflow: maxScroll > 2,
         previous: track.scrollLeft > 2,
         next: track.scrollLeft < maxScroll - 2,
-      });
+      };
+      setPosition((current) =>
+        current.overflow === nextPosition.overflow &&
+        current.previous === nextPosition.previous &&
+        current.next === nextPosition.next
+          ? current : nextPosition
+      );
     }
 
     updatePosition();
