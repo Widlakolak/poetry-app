@@ -228,3 +228,48 @@ No new mounts, Nginx configuration, Cloudflare Tunnel, database migrations,
 or frontend changes are needed in this stage. Nginx continues to reverse-proxy
 `/api/` to `poetryapp-backend` and retains the WorkDone Discord endpoint
 exception. Avoid manually modifying file permissions.
+
+
+### Stage 7: play the first imported MP4 in the existing home screen
+
+The `Wiersz na dziś` card keeps its original cover and layout. It fetches the
+published catalog from `GET /api/v1/media?size=100` and selects the known,
+actually imported local-video title `Białoszewski - Sen Peszek`. The Play
+button stays disabled if this item cannot be found or the API request fails.
+No media UUID, storage key, filesystem path, or media file is compiled into the
+frontend image. The featured artwork is replaced with a native HTML5 video
+element only when the user presses Play. A close button returns to the same
+cover. Native controls provide play/pause, seek, volume and fullscreen when
+supported by the browser.
+
+Video source: `/api/v1/media/{id}/stream`, same origin as the existing catalog,
+using the Stage 6 HTTP Range backend. The browser requests byte ranges; no
+JavaScript blob download, transcoding, or extra media service is introduced.
+
+After merging and a successful GHCR publish, update **only the Poetry App
+frontend** on QNAP:
+
+```sh
+cd /share/CACHEDEV1_DATA/Container/poetryapp
+docker compose --env-file .env -f compose.yaml pull poetryapp-frontend
+docker compose --env-file .env -f compose.yaml up -d --no-deps poetryapp-frontend
+docker compose --env-file .env -f compose.yaml ps
+```
+
+Then open `https://workdone.qzz.io/` in a normal browser:
+1. The existing home layout and section order must stay unchanged.
+2. The first card must show `GOTOWE DO ODTWORZENIA` and an enabled Play button.
+3. Press Play: the actual imported film should play with native controls.
+4. Seek to a later position and verify playback continues.
+5. Close the player: the original cover returns.
+6. Reload the page and verify playback is not automatically started.
+
+If the browser reports a playback failure, inspect its Network tab for the
+`/api/v1/media/{id}/stream` request, including status code and response
+headers. The previous Stage 6 server-side test confirmed
+`206 Partial Content` over Cloudflare for this film, but client codec and
+seek behavior still need a browser test.
+
+No changes to Compose, Nginx, Cloudflare Tunnel, PostgreSQL, or WorkDone are
+part of Stage 7. Future catalog/search, audio, favorites and transcript
+features remain separate stages.
