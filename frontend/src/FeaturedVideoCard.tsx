@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Play, X } from "lucide-react";
+import { LibraryBig } from "lucide-react";
 
 type MediaItem = {
   id: string;
@@ -41,8 +41,6 @@ function findFeaturedMedia(payload: unknown): MediaItem | null {
 export default function FeaturedVideoCard() {
   const [media, setMedia] = useState<MediaItem | null>(null);
   const [loadState, setLoadState] = useState<"loading" | "ready" | "unavailable">("loading");
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [playbackError, setPlaybackError] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -68,80 +66,51 @@ export default function FeaturedVideoCard() {
     return () => controller.abort();
   }, []);
 
-  function closePlayer() {
-    setIsPlaying(false);
-    setPlaybackError(false);
-  }
-
   return (
     <>
       <article className="featured-card">
-        <div className={`featured-artwork${isPlaying ? " featured-artwork-playing" : ""}`}>
-          {isPlaying && media ? (
-            <div className="featured-player">
-              <video
-                controls
-                autoPlay
-                playsInline
-                preload="metadata"
-                src={`/api/v1/media/${encodeURIComponent(media.id)}/stream`}
-                aria-label={`Odtwarzanie: ${media.title}`}
-                onError={() => setPlaybackError(true)}
-              >
-                Twoja przeglądarka nie obsługuje odtwarzania wideo.
-              </video>
-              <button
-                className="player-close-button"
-                type="button"
-                onClick={closePlayer}
-                aria-label="Zamknij odtwarzacz"
-                title="Zamknij odtwarzacz"
-              >
-                <X size={20} strokeWidth={2} aria-hidden="true" />
-              </button>
-              {playbackError ? (
-                <p className="player-error" role="alert">
-                  Nie udało się odtworzyć filmu. Zamknij odtwarzacz i spróbuj ponownie.
-                </p>
-              ) : null}
-            </div>
+        <div className="featured-artwork">
+          <div className="artwork-grain" aria-hidden="true" />
+          <span className="artwork-kicker">INTERPRETACJA POETYCKA</span>
+          <div className="artwork-title">
+            <span>Miron</span>
+            <span>Białoszewski</span>
+          </div>
+          <span className="artwork-work">Sen Peszek</span>
+          <span className="artwork-line" aria-hidden="true" />
+          {media ? (
+            <a
+              className="play-button"
+              href="/biblioteka"
+              aria-label="Przejdź do Biblioteki, aby obejrzeć nagranie"
+              title="Zobacz w Bibliotece"
+            >
+              <LibraryBig size={22} strokeWidth={1.8} aria-hidden="true" />
+            </a>
           ) : (
-            <>
-              <div className="artwork-grain" aria-hidden="true" />
-              <span className="artwork-kicker">INTERPRETACJA POETYCKA</span>
-              <div className="artwork-title">
-                <span>Miron</span>
-                <span>Białoszewski</span>
-              </div>
-              <span className="artwork-work">Sen Peszek</span>
-              <span className="artwork-line" aria-hidden="true" />
-              <button
-                className="play-button"
-                type="button"
-                disabled={!media}
-                onClick={() => { setPlaybackError(false); setIsPlaying(true); }}
-                aria-label="Odtwórz film Białoszewski - Sen Peszek"
-                title={media ? "Odtwórz nagranie" : "Nagranie niedostępne"}
-              >
-                <Play size={22} fill="currentColor" strokeWidth={1.5} aria-hidden="true" />
-              </button>
-              <span className="artwork-status" role="status">
-                {loadState === "ready"
-                  ? "GOTOWE DO ODTWORZENIA"
-                  : loadState === "loading"
-                    ? "SPRAWDZANIE KATALOGU"
-                    : "MATERIAŁ NIEDOSTĘPNY"}
-              </span>
-            </>
+            <button
+              className="play-button"
+              type="button"
+              disabled
+              aria-label="Nagranie niedostępne"
+              title="Nagranie niedostępne"
+            >
+              <LibraryBig size={22} strokeWidth={1.8} aria-hidden="true" />
+            </button>
           )}
+          <span className="artwork-status" role="status">
+            {loadState === "ready"
+              ? "DOSTĘPNE W BIBLIOTECE"
+              : loadState === "loading"
+                ? "SPRAWDZANIE KATALOGU"
+                : "MATERIAŁ NIEDOSTĘPNY"}
+          </span>
         </div>
         <div className="featured-details">
           <div>
             <p className="content-kicker">NAGRANIE WIDEO</p>
             <h3>{media?.title ?? FEATURED_TITLE}</h3>
-            <p className="featured-caption">
-              Plik źródłowy: <code>Bialoszewski Sen Peszek.mp4</code>
-            </p>
+            <p className="featured-caption">Odtwarzanie jest dostępne w Bibliotece.</p>
           </div>
           <span className="media-type">MP4</span>
         </div>
@@ -151,7 +120,7 @@ export default function FeaturedVideoCard() {
           ? "Sprawdzanie dostępności nagrania…"
           : loadState === "unavailable"
             ? "Nagranie jest obecnie niedostępne."
-            : "Wybierz Play, aby obejrzeć nagranie. Możesz je zatrzymać i przewijać."}
+            : "Otwórz Bibliotekę, aby odtworzyć nagranie."}
       </p>
     </>
   );
