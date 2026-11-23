@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Film, LibraryBig, Music2, Play, X } from "lucide-react";
-import { workForRecordingTitle } from "./editorialContent";
+import { fetchWorks, type WorkRecord } from "./catalogApi";
 
 type MediaItem = {
   id: string;
@@ -58,6 +58,8 @@ export default function LibraryView() {
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [playbackError, setPlaybackError] = useState(false);
+  const [linkedWorks, setLinkedWorks] = useState<WorkRecord[]>([]);
+  const [workLookupError, setWorkLookupError] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -92,6 +94,24 @@ export default function LibraryView() {
     void loadPage();
     return () => controller.abort();
   }, [page, retry]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    void fetchWorks(controller.signal)
+      .then((records) => {
+        if (controller.signal.aborted) return;
+        setLinkedWorks(records);
+        setWorkLookupError(false);
+      })
+      .catch(() => {
+        if (controller.signal.aborted) return;
+        setLinkedWorks([]);
+        setWorkLookupError(true);
+      });
+
+    return () => controller.abort();
+  }, [retry]);
 
   const selectedItem = catalog?.content.find((item) => item.id === selectedId);
 
@@ -136,11 +156,20 @@ export default function LibraryView() {
 
       {status === "ready" && catalog && catalog.content.length > 0 ? (
         <>
+          {workLookupError ? (
+            <div className="library-feedback" role="alert">
+              <p>Nie udało się pobrać powiązań nagrań z utworami. Odtwarzanie nadal działa.</p>
+              <button className="library-action" type="button" onClick={() => setRetry((value) => value + 1)}>
+                Spróbuj ponownie
+              </button>
+            </div>
+          ) : null}
           <p className="library-count">Opublikowane materiały: {catalog.totalElements}</p>
           <ul className="library-list">
             {catalog.content.map((item) => {
               const kind = playbackKind(item);
-              const work = workForRecordingTitle(item.title);
+              const worksForRecording = linkedWorks.filter((work) =>
+                work.recordings.some((recording) => recording.id === item.id));
               const playable = kind !== null;
               const expanded = selectedId === item.id;
 
@@ -153,10 +182,14 @@ export default function LibraryView() {
                     <div className="library-item-info">
                       <h2>{item.title}</h2>
                       <p>{item.mediaType === "VIDEO" ? "Wideo" : item.mediaType === "AUDIO" ? "Audio" : "Materiał"}</p>
-                      {work ? (
-                        <a className="library-work-link" href={`/utwory/${work.slug}`}>
-                          O utworze: {work.title}
-                        </a>
+                      {worksForRecording.length > 0 ? (
+                        <div className="library-work-links">
+                          {worksForRecording.map((work) => (
+                            <a className="library-work-link" href={"/utwory/" + work.slug} key={work.id}>
+                              O utworze: {work.title}
+                            </a>
+                          ))}
+                        </div>
                       ) : null}
                     </div>
                     {playable ? (
