@@ -607,3 +607,102 @@ Manual verification:
    native download UI is hidden in supported browsers.
 6. Reloading nested routes works; unknown work slugs return the in-app 404.
 7. With a failed `/api/v1/works` request, the library still plays recordings.
+
+
+### Stage 15: Restore playback on the home page and add YouTube support
+
+The **Wiersz na dziś** home-screen card now plays the existing published
+`Białoszewski - Sen Peszek` MP4 *in place*, with native pause, seek, volume
+and close controls. It still identifies the real imported media by its catalog
+title and takes the stream UUID from the API. Its native video element sets
+`controlsList="nodownload"` (browser-dependent UI hiding only, not DRM).
+
+The **Biblioteka** can now play published `VIDEO / YOUTUBE` catalog records
+using the official YouTube iframe embed. It reads `sourceUrl` from
+`GET /api/v1/media`, accepts only HTTPS links from known YouTube domains,
+validates the 11-character video ID and transforms that ID into a
+`youtube-nocookie.com/embed/` URL. The iframe is only mounted after clicking
+Play. The library closes/unmounts the player when switching items. A link to
+the original YouTube video is always available when the iframe is visible,
+because the publisher may block third-party embeds. Existing local MP3/MP4
+streaming and title-to-work UUID relationships remain unchanged.
+
+On the home page, the existing **Wybrane dla Ciebie** section displays a
+published YouTube catalog video (if available), with a Play button for an
+in-page embed, keeping the existing home section order and visual system.
+Until a YouTube record exists, it continues to show the original empty state.
+
+The requested film is identified by external educational references as
+**The Love Song of J. Alfred Prufrock**, by **T. S. Eliot**, read by
+**Anthony Hopkins**, video ID `PLNsPhKlucY`. The live YouTube page and
+current permission to embed must still be checked in an actual browser.
+Use the original publisher's video via iframe; never download or rehost it.
+Supporting identification references:
+- https://www.academia.edu/15331985/a_Spring_2015_Swarthmore_College_survey_course_in_Modern_American_Poetry_from_Whitman_and_Dickinson_to_the_present_
+- https://teachingcollegelitcom.wordpress.com/teaching-tips-2/world-literature-youtube-enhanced/
+
+The schema already supports `source_type='YOUTUBE'`, so **no new Flyway
+migration or backend change is necessary**. After CI, merge and successful
+GHCR publish, deploy **only the Poetry App frontend**. Afterwards use
+a manual idempotent transaction to publish the YouTube catalog record:
+
+```sh
+cd /share/CACHEDEV1_DATA/Container/poetryapp || exit 1
+
+docker compose --env-file .env -f compose.yaml \
+  exec -T poetryapp-postgres \
+  sh -c 'exec psql -X -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB"' <<'SQL'
+BEGIN;
+
+DO $$
+DECLARE
+    existing_count integer;
+BEGIN
+    SELECT count(*) INTO existing_count
+      FROM media_item
+     WHERE source_type = 'YOUTUBE'
+       AND source_url = 'https://www.youtube.com/watch?v=PLNsPhKlucY';
+
+    IF existing_count > 1 THEN
+        RAISE EXCEPTION 'Duplicated YouTube source URL in catalog';
+    END IF;
+
+    IF existing_count = 0 THEN
+        INSERT INTO media_item (
+            id, title, media_type, source_type, source_url,
+            publication_status, transcript_status, published_at
+        ) VALUES (
+            gen_random_uuid(),
+            'The Love Song of J. Alfred Prufrock — T. S. Eliot, Anthony Hopkins',
+            'VIDEO', 'YOUTUBE',
+            'https://www.youtube.com/watch?v=PLNsPhKlucY',
+            'PUBLISHED', 'NOT_AVAILABLE', CURRENT_TIMESTAMP
+        );
+    END IF;
+END
+$$;
+
+COMMIT;
+
+SELECT id, title, source_type, source_url, publication_status
+  FROM media_item
+ WHERE source_type = 'YOUTUBE'
+   AND source_url = 'https://www.youtube.com/watch?v=PLNsPhKlucY';
+SQL
+```
+
+This writes metadata only. No local file, storage key, checksum, transcript,
+creator link or recorded-media copy is created. Subsequent work can add the
+verified Eliot/Hopkins credits and a `literary_work` entry, but these are
+not inferred automatically from filenames or third-party content. The SQL
+is safe to rerun for the same canonical URL and will not create duplicates.
+
+After the SQL, validate `GET /api/v1/media?size=20` includes six items,
+one with source type `YOUTUBE`. Confirm play/close from **Biblioteka** and
+**Wybrane dla Ciebie**, and original MP4 play/close from **Wiersz na dziś**.
+If YouTube has disabled embedding, the watch link must still open the source
+video. Check that native local players have no Download button in supported
+browsers; YouTube's own player UI is under YouTube's control.
+
+No changes to PostgreSQL schema, backend image, Compose, shared Nginx,
+Cloudflare or other QNAP services in this stage.
