@@ -119,6 +119,61 @@ class MediaStreamControllerIntegrationTest {
         assertTrue(Files.notExists(mediaDirectory.resolve("../private.mp4")));
     }
 
+    @Test
+    void returnsAudioMpegAndSupportsMp3ByteRange() throws Exception {
+        UUID id = createAudio(PublicationStatus.PUBLISHED, true, null);
+
+        mockMvc.perform(get("/api/v1/media/{id}/stream", id))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", "audio/mpeg"))
+                .andExpect(content().bytes(VIDEO_BYTES));
+        mockMvc.perform(get("/api/v1/media/{id}/stream", id)
+                        .header("Range", "bytes=1-4"))
+                .andExpect(status().isPartialContent())
+                .andExpect(header().string("Content-Type", "audio/mpeg"))
+                .andExpect(header().string("Content-Range", "bytes 1-4/12"))
+                .andExpect(content().bytes("BCDE".getBytes(StandardCharsets.US_ASCII)));
+    }
+
+    @Test
+    void unpublishedAudioAndMissingMp3AreNotAvailable() throws Exception {
+        UUID unpublished = createAudio(PublicationStatus.PROCESSING, true, null);
+        UUID missing = createAudio(PublicationStatus.PUBLISHED, false, null);
+
+        mockMvc.perform(get("/api/v1/media/{id}/stream", unpublished))
+                .andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/v1/media/{id}/stream", missing))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void rejectsInvalidMp3StorageKeyAndMediaTypeMismatch() throws Exception {
+        UUID traversal = createAudio(PublicationStatus.PUBLISHED, false, "../secret.mp3");
+        UUID mismatch = createAudio(PublicationStatus.PUBLISHED, true, UUID.randomUUID() + ".mp4");
+
+        mockMvc.perform(get("/api/v1/media/{id}/stream", traversal))
+                .andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/v1/media/{id}/stream", mismatch))
+                .andExpect(status().isNotFound());
+    }
+
+    private UUID createAudio(PublicationStatus status, boolean createFile, String overrideStorageKey)
+            throws Exception {
+        String storageKey = overrideStorageKey != null ? overrideStorageKey : UUID.randomUUID() + ".mp3";
+        if (createFile) {
+            Files.write(mediaDirectory.resolve(storageKey), VIDEO_BYTES);
+        }
+
+        MediaItem item = new MediaItem(
+                "Integration test audio", MediaType.AUDIO, MediaSourceType.LOCAL_FILE,
+                null, "test.mp3", storageKey, "audio/mpeg", (long) VIDEO_BYTES.length,
+                null, null, status, TranscriptStatus.NOT_AVAILABLE);
+        if (status == PublicationStatus.PUBLISHED) {
+            item.publish();
+        }
+        return mediaItemRepository.saveAndFlush(item).getId();
+    }
+
     private UUID createVideo(PublicationStatus status, boolean createFile, String overrideStorageKey)
             throws Exception {
         String storageKey = overrideStorageKey != null
