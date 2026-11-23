@@ -275,6 +275,70 @@ h1 {
   cursor: not-allowed;
 }
 
+.play-button:not(:disabled) {
+  opacity: 1;
+  cursor: pointer;
+}
+
+.play-button:not(:disabled):hover {
+  background: #f5f1e8;
+}
+
+.featured-artwork-playing {
+  min-height: 0;
+  padding: 0;
+  display: block;
+  background: #171a16;
+}
+
+.featured-player {
+  position: relative;
+  width: 100%;
+  background: #171a16;
+}
+
+.featured-player video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: 70vh;
+  object-fit: contain;
+  background: #171a16;
+}
+
+.player-close-button {
+  position: absolute;
+  z-index: 1;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #d9d7c9;
+  border-radius: 50%;
+  background: rgba(244, 241, 233, 0.94);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.player-close-button:hover {
+  background: #ffffff;
+}
+
+.player-error {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  max-width: calc(100% - 80px);
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #ffffff;
+  background: rgba(40, 42, 38, 0.92);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
 .artwork-status {
   position: absolute;
   right: 24px;
