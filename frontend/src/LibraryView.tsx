@@ -181,6 +181,7 @@ export default function LibraryView() {
                         <audio
                           key={selectedItem.id}
                           controls
+                          controlsList="nodownload"
                           autoPlay
                           preload="metadata"
                           src={`/api/v1/media/${encodeURIComponent(selectedItem.id)}/stream`}
@@ -193,6 +194,7 @@ export default function LibraryView() {
                         <video
                           key={selectedItem.id}
                           controls
+                          controlsList="nodownload"
                           autoPlay
                           playsInline
                           preload="metadata"
