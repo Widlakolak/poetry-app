@@ -273,3 +273,44 @@ seek behavior still need a browser test.
 No changes to Compose, Nginx, Cloudflare Tunnel, PostgreSQL, or WorkDone are
 part of Stage 7. Future catalog/search, audio, favorites and transcript
 features remain separate stages.
+
+
+### Stage 8: Browse the published media library
+
+The existing bottom navigation now opens the **Biblioteka** view. Its list is
+loaded from the existing, read-only `GET /api/v1/media?page=N&size=20`
+endpoint. It displays only real published items returned by the API, without
+seed content or filesystem paths. The page provides previous/next pagination,
+a clear empty state, and retry when the API is unavailable.
+
+A published `VIDEO / LOCAL_FILE` item can play directly in the library using
+the existing `/api/v1/media/{id}/stream` endpoint and native HTML5 controls.
+Switching items or leaving the library unmounts the previous video, stopping
+playback. Other source types are listed without a misleading Play button until
+their playback support has been implemented.
+
+The **Wiersz na dziś**, **Poeci**, **Artyści** and **Wybrane dla Ciebie**
+home-screen sections and their layout remain unchanged. Search, favorites,
+audio import/streaming, and YouTube playback are not enabled in this stage.
+
+After CI success, merge the PR, confirm the GHCR frontend publish is successful,
+then update *only* the Poetry App frontend:
+
+```sh
+cd /share/CACHEDEV1_DATA/Container/poetryapp
+docker compose --env-file .env -f compose.yaml pull poetryapp-frontend
+docker compose --env-file .env -f compose.yaml up -d --no-deps poetryapp-frontend
+docker compose --env-file .env -f compose.yaml ps
+```
+
+Manually verify on `https://workdone.qzz.io/`:
+1. The home screen and featured MP4 still play as before.
+2. Tap **Biblioteka** to see the actual published film.
+3. Play and seek in the library; close the player.
+4. Return to **Ekran główny**; its layout remains unchanged.
+5. The navigation buttons for unimplemented features stay disabled.
+6. When more than 20 items exist, next/previous should page through them;
+   with one item both pagination controls stay disabled.
+
+Only the frontend and README change. No new backend, database, Nginx,
+Cloudflare Tunnel, Compose, or Docker mount configuration is required.
