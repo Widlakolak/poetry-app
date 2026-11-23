@@ -122,11 +122,10 @@ rekordów):
   ładowania, pustej listy i błędu API oraz poprawne zachowanie przy
   jednym kafelku.
 
-**Status: Etap 17 — implementacja przygotowana w osobnym PR.**
-Etap 16 podłączył dynamiczną sekcję **Artyści**, a Etap 17 wprowadza
+**Status: Etap 17 — PR scalony; właściciel potwierdził wygląd na telefonie.**
+Etap 16 podłączył dynamiczną sekcję **Artyści**, a Etap 17 wprowadził
 przewijane poziomo karty do trzech sekcji na stronie głównej.
-Wdrożenie na QNAP i testy interakcji w przeglądarce nadal wymagają
-zatwierdzenia, merge i opublikowania obrazu frontendu.
+Etap 18 przygotowuje działające wyszukiwanie katalogu.
 
 
 
@@ -743,7 +742,7 @@ No changes to PostgreSQL schema, backend image, Compose, shared Nginx,
 Cloudflare or other QNAP services in this stage.
 
 
-### Stage 16: Database-backed artists and credited recordings (not merged yet)
+### Stage 16: Database-backed artists and credited recordings
 
 The existing home **Artyści** section now fetches the real list of creators
 credited as `ARTIST` through `GET /api/v1/creators?role=ARTIST`.
@@ -888,3 +887,70 @@ docker compose --env-file .env -f compose.yaml ps
 The CI production build checks TypeScript and Vite bundling. Real
 touch/keyboard playback behavior must still be confirmed after deployment
 on target browsers; CI alone does not prove it.
+
+
+### Stage 18: Search the published catalog (frontend only)
+
+The bottom-navigation **Szukaj** (magnifying glass) now links to `/szukaj`.
+The search page loads the **published** catalog using the existing,
+read-only, paginated endpoints:
+
+- `GET /api/v1/media` — recording titles and playback metadata;
+- `GET /api/v1/works` — published literary works with confirmed authors;
+- `GET /api/v1/creators?role=POET` — poets;
+- `GET /api/v1/creators?role=ARTIST` — artists.
+
+The frontend fetches all pages (100 records per page, as existing
+`catalogApi.ts` already does for authors and works) and filters the
+loaded metadata locally as the user types. This is suitable for the small
+MVP catalog; it is **not** a server-side full-text search index and
+does not search unverified transcripts or the contents of MP3/MP4 files.
+Matching is case-insensitive, ignores Polish diacritics and punctuation,
+and requires every entered word to be present in the searchable title
+and/or confirmed author name. Empty input does not display fake results.
+
+Results are grouped as **Nagrania**, **Utwory**, **Poeci** and **Artyści**.
+Person and work results link to existing API-backed detail pages.
+Published MP3 and MP4 recordings use the existing HTTP Range stream
+and native player; verified YouTube links use the existing official
+privacy-enhanced iframe with a watch-link fallback. Only one player on
+the Search page is active at once. Changing or clearing the query,
+switching media, or leaving the page unmounts the player. Local players
+use `controlsList="nodownload"` as a browser UI hint, not DRM.
+
+Loading, API failure/retry, empty-query, and no-results states are
+explicit. No new search backend, library, schema migration, import,
+credentials or QNAP infrastructure is added. The original home layout
+and three stage-17 horizontal rails remain unchanged. The **Ulubione**
+and **Edukacja** buttons remain intentionally outside this stage.
+
+**Deployment after PR review, green CI, merge and GHCR publish:**
+
+```sh
+cd /share/CACHEDEV1_DATA/Container/poetryapp
+docker compose --env-file .env -f compose.yaml pull poetryapp-frontend
+docker compose --env-file .env -f compose.yaml up -d --no-deps poetryapp-frontend
+docker compose --env-file .env -f compose.yaml ps
+```
+
+**Manual smoke tests before presenting the MVP:**
+
+1. Tap **Szukaj** on a phone. Its active navigation state is visible;
+   refreshing `/szukaj` opens the same search page.
+2. Search `Białoszewski`, `Hopkins`, `Eliot`, and `osma` (without
+   accents); only actual published catalog matches should appear.
+   Terms in a different order should still match, and clearing the
+   query should return to the entry prompt.
+3. Open a poet, artist and work result; the correct existing profile
+   should appear and direct URL reload must work.
+4. Play one MP3, one MP4 and one YouTube video from search (when
+   present); seek local media, switch results and close the player.
+   Check the official YouTube source link if the embed is blocked.
+5. Try a nonsense query, an empty catalog, API outage/retry, keyboard
+   navigation, 320px phone width and 200% browser zoom.
+6. Revisit the original home rails, Wiersz na dziś, Biblioteka, and
+   artist/poet pages. Check there are no regressions.
+
+Search is a navigation feature, not proof of public-distribution rights.
+Before an external demo, confirm permissions for any publicly accessible
+poems, recordings and video excerpts, and verify the public domain/route.

@@ -6,6 +6,14 @@ export type CreatorRecord = {
   biography: string | null;
 };
 
+export type MediaRecord = {
+  id: string;
+  title: string;
+  mediaType: string;
+  sourceType: string;
+  sourceUrl: string | null;
+};
+
 export type RecordingRecord = {
   id: string;
   title: string;
@@ -31,6 +39,15 @@ type CatalogPage<T> = {
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function isMedia(value: unknown): value is MediaRecord {
+  return isObject(value)
+    && typeof value.id === "string"
+    && typeof value.title === "string"
+    && typeof value.mediaType === "string"
+    && typeof value.sourceType === "string"
+    && (value.sourceUrl === null || typeof value.sourceUrl === "string");
 }
 
 function isRecording(value: unknown): value is RecordingRecord {
@@ -98,6 +115,10 @@ async function loadAllPages<T>(
     if (page + 1 >= payload.totalPages) return items;
     page += 1;
   }
+}
+
+export function fetchMedia(signal: AbortSignal): Promise<MediaRecord[]> {
+  return loadAllPages("/api/v1/media", isMedia, signal);
 }
 
 export function fetchPoets(signal: AbortSignal): Promise<CreatorRecord[]> {
