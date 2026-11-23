@@ -14,8 +14,9 @@ import FeaturedVideoCard from "./FeaturedVideoCard";
 import LibraryView from "./LibraryView";
 import PoetsPreview from "./PoetsPreview";
 import RecommendationsRail from "./RecommendationsRail";
+import SearchView from "./SearchView";
 
-type Page = "home" | "library" | "editorial";
+type Page = "home" | "library" | "search" | "editorial";
 
 type NavigationItem = {
   label: string;
@@ -28,7 +29,7 @@ const navigation: NavigationItem[] = [
   { label: "Edukacja", icon: GraduationCap },
   { label: "Biblioteka", icon: LibraryBig, page: "library" },
   { label: "Ulubione", icon: Heart },
-  { label: "Szukaj", icon: Search },
+  { label: "Szukaj", icon: Search, page: "search" },
 ];
 
 function SectionHeading({
@@ -71,7 +72,7 @@ function BottomNavigation({ currentPage }: { currentPage: Page }) {
             disabled={!page}
             onClick={() => {
               if (page) {
-                window.location.assign(page === "home" ? "/" : "/biblioteka");
+                window.location.assign(page === "home" ? "/" : page === "library" ? "/biblioteka" : "/szukaj");
               }
             }}
             title={page ? label : `${label} - kolejny etap`}
@@ -88,7 +89,7 @@ function BottomNavigation({ currentPage }: { currentPage: Page }) {
 export default function App() {
   const pathname = window.location.pathname;
   const currentPage: Page =
-    pathname === "/" ? "home" : pathname === "/biblioteka" ? "library" : "editorial";
+    pathname === "/" ? "home" : pathname === "/biblioteka" ? "library" : pathname === "/szukaj" ? "search" : "editorial";
 
   return (
     <div className="app-shell">
@@ -154,6 +155,8 @@ export default function App() {
         </main>
       ) : currentPage === "library" ? (
         <LibraryView />
+      ) : currentPage === "search" ? (
+        <SearchView />
       ) : (
         <EditorialPages pathname={pathname} />
       )}
