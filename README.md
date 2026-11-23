@@ -82,6 +82,17 @@ Inspiracja dotyczy filozofii projektowania i charakteru interfejsu, a nie kopiow
 - przygotowanie możliwości wykorzystania aplikacji podczas zajęć edukacyjnych;
 - poszukiwanie partnerstw z twórcami i instytucjami kultury.
 
+### Etap 4 - Napisy zsynchronizowane z odtwarzaniem
+
+- wyświetlanie zatwierdzonego tekstu wiersza lub transkrypcji jako napisów podczas odtwarzania MP3 i MP4;
+- powiązanie fragmentów tekstu ze znacznikami czasu, aby aktualny wers lub wypowiedź pojawiała się dokładnie w odpowiednim momencie;
+- automatyczne przewijanie i dyskretne podświetlanie aktualnego fragmentu (opcjonalny tryb karaoke), z możliwością wyłączenia napisów;
+- utrzymanie synchronizacji po pauzie i przewijaniu nagrania;
+- przygotowanie lub korekta transkrypcji i czasów przed publikacją; ewentualna automatyczna transkrypcja może wspomagać przygotowanie materiału, ale nie jest wymagana podczas każdego odtworzenia;
+- udostępnianie napisów tylko wtedy, gdy istnieje zweryfikowany tekst i odpowiednie prawa do jego publikacji.
+
+Napisy „w czasie rzeczywistym” oznaczają tutaj synchronizację z bieżącym czasem odtwarzania, a nie kosztowne rozpoznawanie mowy na żywo przy każdym odsłuchaniu. Etap będzie realizowany po zatwierdzeniu zakresu i przygotowaniu wiarygodnych tekstów nagrań.
+
 Kolejne etapy będą zależały od rezultatów prac nad pierwszą wersją, potrzeb odbiorców oraz dostępnych zasobów.
 
 ## Technologia i utrzymanie
