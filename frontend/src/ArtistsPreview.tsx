@@ -1,17 +1,21 @@
 import { useEffect, useState } from "react";
 import { UsersRound } from "lucide-react";
 import { creatorSlug, fetchArtists, type CreatorRecord } from "./catalogApi";
+import HorizontalCardRail from "./HorizontalCardRail";
 
 export default function ArtistsPreview() {
-  const [artists, setArtists] = useState<CreatorRecord[]>([]);
+  const [creators, setCreators] = useState<CreatorRecord[]>([]);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [retry, setRetry] = useState(0);
 
   useEffect(() => {
     const controller = new AbortController();
+    setStatus("loading");
+
     void fetchArtists(controller.signal)
       .then((records) => {
         if (controller.signal.aborted) return;
-        setArtists(records);
+        setCreators(records);
         setStatus("ready");
       })
       .catch(() => {
@@ -19,9 +23,9 @@ export default function ArtistsPreview() {
       });
 
     return () => controller.abort();
-  }, []);
+  }, [retry]);
 
-  if (status !== "ready" || artists.length === 0) {
+  if (status !== "ready" || creators.length === 0) {
     const message = status === "loading"
       ? "Wczytywanie katalogu artystów…"
       : status === "error"
@@ -34,25 +38,36 @@ export default function ArtistsPreview() {
           <span className="empty-collection-mark" aria-hidden="true">
             <UsersRound size={21} strokeWidth={1.6} />
           </span>
-          <p role="status">{message}</p>
+          <div>
+            <p role="status">{message}</p>
+            {status === "error" ? (
+              <button className="library-action collection-retry" type="button" onClick={() => setRetry((value) => value + 1)}>
+                Spróbuj ponownie
+              </button>
+            ) : null}
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="poet-preview-list">
-      {artists.map((artist) => (
-        <a className="poet-preview" href={"/artysci/" + creatorSlug(artist.displayName)} key={artist.id}>
-          <span className="poet-preview-mark" aria-hidden="true">
-            <UsersRound size={23} strokeWidth={1.5} />
-          </span>
-          <span>
-            <strong>{artist.displayName}</strong>
-            <small>Zobacz interpretacje w bibliotece</small>
-          </span>
-        </a>
-      ))}
-    </div>
+    <HorizontalCardRail
+      labelledBy="artists-title"
+      label="Artyści"
+      items={creators.map((creator) => ({
+        key: creator.id,
+        content: (
+          <a className="catalog-person-card" href={"/artysci/" + creatorSlug(creator.displayName)}>
+            <span className="catalog-person-mark" aria-hidden="true">
+              <UsersRound size={26} strokeWidth={1.5} />
+            </span>
+            <span className="catalog-person-role">WYKONAWCA</span>
+            <strong>{creator.displayName}</strong>
+            <small>Poznaj interpretacje i nagrania</small>
+          </a>
+        ),
+      }))}
+    />
   );
 }

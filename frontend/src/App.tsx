@@ -13,7 +13,7 @@ import ArtistsPreview from "./ArtistsPreview";
 import FeaturedVideoCard from "./FeaturedVideoCard";
 import LibraryView from "./LibraryView";
 import PoetsPreview from "./PoetsPreview";
-import YouTubeRecommendation from "./YouTubeRecommendation";
+import RecommendationsRail from "./RecommendationsRail";
 
 type Page = "home" | "library" | "editorial";
 
@@ -149,7 +149,7 @@ export default function App() {
             description="Miejsce na kolejne odkrycia."
             icon={Heart}
           />
-          <YouTubeRecommendation />
+          <RecommendationsRail />
         </section>
         </main>
       ) : currentPage === "library" ? (

@@ -122,11 +122,11 @@ rekordów):
   ładowania, pustej listy i błędu API oraz poprawne zachowanie przy
   jednym kafelku.
 
-**Status: poziome kafelki są nadal planowane i jeszcze niewdrożone.**
-Etap 16 podłącza dynamiczną sekcję **Artyści** do katalogu, bez wprowadzania
-karuzeli. Poziome kafelki wymagają osobnego etapu i testów na telefonie
-oraz komputerze, bez przebudowy układu ekranu głównego ani zmian
-infrastruktury QNAP.
+**Status: Etap 17 — implementacja przygotowana w osobnym PR.**
+Etap 16 podłączył dynamiczną sekcję **Artyści**, a Etap 17 wprowadza
+przewijane poziomo karty do trzech sekcji na stronie głównej.
+Wdrożenie na QNAP i testy interakcji w przeglądarce nadal wymagają
+zatwierdzenia, merge i opublikowania obrazu frontendu.
 
 
 
@@ -805,3 +805,86 @@ load normally.
 
 All changes remain inside Poetry App: no file import, database changes,
 QNAP mounts, Nginx, Cloudflare, PoetryStream or WorkDone service changes.
+
+
+### Stage 17: Swipeable catalog cards on the home page (frontend only)
+
+The existing **Poeci**, **Artyści** and **Wybrane dla Ciebie** sections
+now use one small, dependency-free `HorizontalCardRail` component:
+- Horizontal scroll and touch swipe, with a preview of the next card on
+  narrow screens and visible thin scrollbars when supported.
+- Prev/next arrow buttons appear **only when content actually overflows**.
+  Buttons disable at the beginning/end; a single card has no fake controls.
+- The rail itself can receive keyboard focus. Arrow Left/Right scroll one
+  card; Home/End go to the first/last card. Key handling is restricted to
+  the focused rail so inputs, media players and nested links work normally.
+- CSS scroll snapping keeps cards aligned without autoplay or automatic
+  rotation. `prefers-reduced-motion` disables smooth scrolling.
+- All cards use neutral text, icon and background treatment — no invented
+  portraits, thumbnails, author biographies, or credits.
+- Loading, empty and API failure states preserve the existing home layout.
+  An API failure displays a retry action without stale or fake entries.
+- The **Wiersz na dziś** featured MP4 remains a separate large card with
+  in-place playback. The section order stays unchanged.
+
+**Live data:** Poets are still fetched from
+`GET /api/v1/creators?role=POET`, artists from
+`GET /api/v1/creators?role=ARTIST` and link to their existing profiles.
+Recommendation cards show the first 20 **published, playable** media
+records from `GET /api/v1/media?page=0&size=20` in the catalog's
+newest-first order. This is a bounded editorial-style catalog preview,
+**not** an algorithmic personalized recommendation service. Invalid
+or unsupported source types are not offered a misleading Play button.
+A separate future stage can add curated selection or pagination.
+
+The recommendations rail plays **one of its own cards at a time**:
+- published local `AUDIO` -> existing MP3 streaming with native audio controls;
+- published local `VIDEO` -> existing MP4 streaming with native video controls;
+- validated `YOUTUBE` video -> the existing privacy-enhanced official
+  YouTube iframe and a fallback link to the source.
+Opening another recording unmounts the previous player. Closing the card
+unmounts it without changing the URL or leaving the home screen.
+Local players request `controlsList="nodownload"` (not DRM).
+No media is copied, reimported, or stored in the database.
+
+**Scope:** frontend only (React components, CSS and README). No new
+dependencies, backend endpoints, Flyway migrations, database updates,
+Nginx, Cloudflare, Compose, media volume or deployment changes.
+
+**Deployment (only after merge + green GHCR publish):**
+
+```sh
+cd /share/CACHEDEV1_DATA/Container/poetryapp || exit 1
+docker compose --env-file .env -f compose.yaml pull poetryapp-frontend || exit 1
+docker compose --env-file .env -f compose.yaml up -d --no-deps poetryapp-frontend || exit 1
+docker compose --env-file .env -f compose.yaml ps
+```
+
+**Manual browser acceptance checklist (mobile and desktop):**
+1. Confirm the unchanged order: Wiersz na dziś, Poeci, Artyści,
+   Wybrane dla Ciebie. Featured MP4 still plays, pauses and seeks.
+2. On a 320–390 px phone, swipe Poeci / Artyści / recommendations sideways,
+   verify a partial next card is visible where two or more items exist,
+   and ensure the *whole page* does not scroll horizontally.
+3. On desktop, try arrow controls on an overflowing rail; disabled arrows
+   must not scroll past the ends. At wide widths where all cards fit,
+   arrows disappear instead of implying more content.
+4. Tab onto a rail itself, press Arrow Left/Right and Home/End; then tab
+   into a card link or Play button. Native keyboard activation and
+   player keyboard controls must still work.
+5. Current dataset has **two poets, one artist, six media items**:
+   verify T. S. Eliot, Miron Białoszewski, Anthony Hopkins, and
+   published YouTube, MP3, and MP4 cards with no fabricated associations.
+6. Open a YouTube card and use the official iframe; close it and confirm
+   playback stops. Open MP3/MP4 cards, play and seek, then switch to
+   another recording and confirm the previous player unmounts.
+7. Test browser zoom (200%), narrow display and `prefers-reduced-motion`;
+   focus rings and text labels must remain visible, without overlapping
+   player buttons or navigation.
+8. Simulate an API failure in the browser Network tab, verify a clear
+   error/retry state. A singleton/empty section must not expose
+   non-functional arrows. Confirm the standalone Biblioteka still works.
+
+The CI production build checks TypeScript and Vite bundling. Real
+touch/keyboard playback behavior must still be confirmed after deployment
+on target browsers; CI alone does not prove it.

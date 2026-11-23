@@ -1050,3 +1050,243 @@ code {
 .artist-recording-card .library-work-link {
   margin-right: 12px;
 }
+
+
+/* Stage 17 — shared, horizontally scrollable catalog cards. */
+.catalog-rail {
+  position: relative;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.catalog-rail-controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: 0 2px 8px;
+}
+
+.catalog-rail-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--olive-dark);
+  background: var(--white);
+  cursor: pointer;
+}
+
+.catalog-rail-arrow:hover:not(:disabled) {
+  border-color: #aab19e;
+  background: #e9e8dd;
+}
+
+.catalog-rail-arrow:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.catalog-rail-arrow:focus-visible,
+.catalog-person-card:focus-visible,
+.catalog-media-play:focus-visible {
+  outline: 2px solid var(--olive-dark);
+  outline-offset: 3px;
+}
+
+.catalog-rail-track {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
+  gap: 14px;
+  margin: 0;
+  padding: 2px 2px 12px;
+  box-sizing: border-box;
+  list-style: none;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 2px;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.catalog-rail-track:focus-visible {
+  outline: 2px solid var(--olive-dark);
+  outline-offset: -2px;
+  border-radius: 14px;
+}
+
+.catalog-rail-item {
+  display: flex;
+  flex: 0 0 clamp(240px, 72vw, 300px);
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+.catalog-person-card {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  min-height: 210px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 90% 0%, rgba(195, 198, 173, 0.20), transparent 48%),
+    var(--white);
+  text-decoration: none;
+}
+
+.catalog-person-card:hover {
+  border-color: #aab19e;
+  background-color: #f8f7f1;
+}
+
+.catalog-person-mark {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  color: var(--olive-dark);
+  background: #e9e8dd;
+}
+
+.catalog-person-role {
+  margin-top: auto;
+  padding-top: 26px;
+  color: var(--olive);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+}
+
+.catalog-person-card strong {
+  display: block;
+  margin: 6px 0;
+  font-size: 18px;
+  line-height: 1.3;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.catalog-person-card small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.catalog-media-card {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--white);
+}
+
+.catalog-media-cover {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 112px;
+  padding: 18px;
+  color: #f5f1e8;
+  background:
+    radial-gradient(ellipse at 85% 15%, rgba(192, 190, 159, 0.24), transparent 55%),
+    #42463d;
+}
+
+.catalog-media-cover span {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.catalog-media-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  min-width: 0;
+  padding: 18px;
+}
+
+.catalog-media-body h3 {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.4;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.catalog-media-play {
+  margin-top: auto;
+}
+
+.catalog-media-player {
+  width: 100%;
+  min-width: 0;
+  margin-top: auto;
+}
+
+.catalog-media-player video,
+.catalog-media-player audio {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.catalog-media-player video {
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #171a16;
+}
+
+.catalog-media-player .library-action {
+  margin-top: 10px;
+}
+
+.catalog-media-player .youtube-player-note {
+  font-size: 11px;
+}
+
+/* YouTube's embedded controls need a usable height in narrow cards. */
+.catalog-media-player .youtube-player iframe {
+  min-height: 200px;
+}
+
+.collection-retry {
+  margin-top: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .catalog-rail-track {
+    scroll-behavior: auto;
+  }
+}
+
+@media (max-width: 420px) {
+  .catalog-person-card {
+    min-height: 196px;
+    padding: 17px;
+  }
+
+  .catalog-media-body {
+    padding: 15px;
+  }
+}
