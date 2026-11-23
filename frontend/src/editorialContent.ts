@@ -9,6 +9,7 @@ export type EditorialWork = {
   slug: string;
   title: string;
   recordingTitle: string;
+  previousRecordingTitle?: string;
   recordingDescription: string;
   about: string;
   context: string;
@@ -46,7 +47,8 @@ export const works: EditorialWork[] = [
   {
     slug: "odczepic-sie",
     title: "Odczepić się",
-    recordingTitle: "02 Track 02",
+    recordingTitle: "Odczepić się",
+    previousRecordingTitle: "02 Track 02",
     recordingDescription: "Ścieżka 2 z 75 na płycie „Białoszewski do słuchu”, vol. 3 — „Blok”.",
     about:
       "Krótka pozycja z archiwalnej kolekcji nagrań poświęconej twórczości Mirona Białoszewskiego. W spisie trzeciego woluminu albumu figuruje jako drugi utwór.",
@@ -63,7 +65,8 @@ export const works: EditorialWork[] = [
   {
     slug: "siodma-osma",
     title: "Siódma, ósma",
-    recordingTitle: "12 Track 12",
+    recordingTitle: "Siódma, ósma",
+    previousRecordingTitle: "12 Track 12",
     recordingDescription: "Ścieżka 12 z 75 na płycie „Białoszewski do słuchu”, vol. 3 — „Blok”; w spisie oznaczona jako fragment „Chamowa”.",
     about:
       "Wydawniczy spis utworów łączy „Siódma, ósma” z „Chamowem”, dziennikarsko-literackim zapisem codzienności autora po przeprowadzce na warszawską Lizbońską.",
@@ -80,7 +83,7 @@ export const works: EditorialWork[] = [
 ];
 
 export function workForRecordingTitle(title: string): EditorialWork | undefined {
-  return works.find((work) => work.recordingTitle === title);
+  return works.find((work) => work.recordingTitle === title || work.previousRecordingTitle === title);
 }
 
 export function workForSlug(slug: string): EditorialWork | undefined {
