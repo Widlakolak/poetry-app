@@ -497,3 +497,52 @@ Manual checks:
 Only frontend files and README change; no backend, Flyway, database
 schema, Compose, shared Nginx or Cloudflare updates are part of this
 stage.
+
+
+### Stage 12: Persistent literary works and recording associations (backend)
+
+This stage adds a **catalog structure**, not guessed content:
+
+- `creator` remains the existing person entity (used for poets and artists);
+- `literary_work` stores an individual work (stable slug, title, optional
+  original editorial summary, author reference, explicit published flag);
+- `work_recording` links works to media. The many-to-many relationship
+  supports several readings of one poem and compilation recordings containing
+  several works.
+
+Flyway migration `V3__literary_works_and_recordings.sql` creates only
+new tables and indexes. It **does not** touch existing `media_item` rows,
+modify the audio/video files, change titles, or seed author/performer credits.
+
+Read-only endpoints:
+
+- `GET /api/v1/works?page=0&size=20` — paginated **published**
+  works (max size 100), sorted by title;
+- `GET /api/v1/works/{slug}` — one published work and its author,
+  verified editorial summary, and **published** recording records only;
+- unknown or unpublished works return 404. Recordings still marked
+  `PROCESSING` or `ERROR` do not appear within a work.
+
+No public write endpoints are provided. Works begin as unpublished, with
+no automatically generated creator, author, text, or recording attribution.
+The current front-end editorial pages and the Library continue working
+independently of this new API until a later approved migration of their
+verified content and links. The database starts with an empty
+`literary_work` table after deployment.
+
+**Deployment caution:** Flyway runs on backend startup, so before merging
+check the SQL diff and ensure the QNAP PostgreSQL database has a backup.
+After successful CI, merge and GHCR publication, deploy **only the
+`poetryapp-backend`** (not PostgreSQL, Nginx, Cloudflare, or PoetryStream).
+Confirm the existing `GET /api/v1/media` remains unchanged and
+`GET /api/v1/works` returns a valid empty page. Do not delete volumes.
+
+**Next data-population stage (separate review):** verify the live IDs and
+new titles of the two confirmed Białoszewski audio tracks, then insert
+one creator and two works and link them in a manual transaction.
+Do not infer other tracks, biographies, performers or transcript texts
+from their filenames. The two existing frontend pages should later
+read these persisted records instead of hardcoded title matches.
+
+**Rights:** linking descriptive metadata does not imply permission to
+publicly distribute a text, performance, or recorded album.
