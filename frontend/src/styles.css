@@ -990,3 +990,50 @@ code {
   color: var(--muted);
   font-size: 12px;
 }
+
+/* Stage 15: native home playback and official YouTube embeds. */
+.youtube-player {
+  width: 100%;
+}
+
+.youtube-player iframe {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: none;
+  border-radius: 8px;
+  background: #171a16;
+}
+
+.youtube-player-note {
+  margin: 10px 2px 4px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.youtube-player-note a {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--olive-dark);
+  text-underline-offset: 3px;
+}
+
+.recommended-youtube-header {
+  padding: 20px 20px 6px;
+}
+
+.recommended-youtube-header h3 {
+  font-size: 17px;
+  line-height: 1.4;
+}
+
+.recommended-youtube-player,
+.recommended-youtube-action {
+  padding: 12px 20px 20px;
+}
+
+.recommended-youtube-player > .library-action {
+  margin-top: 12px;
+}

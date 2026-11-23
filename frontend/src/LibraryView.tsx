@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { Film, LibraryBig, Music2, Play, X } from "lucide-react";
 import { fetchWorks, type WorkRecord } from "./catalogApi";
+import { youtubeVideoId } from "./youtubeSource";
+import YouTubeEmbed from "./YouTubeEmbed";
 
 type MediaItem = {
   id: string;
   title: string;
   mediaType: string;
   sourceType: string;
+  sourceUrl: string | null;
 };
 
 type MediaPage = {
@@ -25,7 +28,8 @@ function isMediaItem(value: unknown): value is MediaItem {
     "id" in value && typeof value.id === "string" &&
     "title" in value && typeof value.title === "string" &&
     "mediaType" in value && typeof value.mediaType === "string" &&
-    "sourceType" in value && typeof value.sourceType === "string"
+    "sourceType" in value && typeof value.sourceType === "string" &&
+    "sourceUrl" in value && (typeof value.sourceUrl === "string" || value.sourceUrl === null)
   );
 }
 
@@ -44,7 +48,10 @@ function isMediaPage(value: unknown): value is MediaPage {
   );
 }
 
-function playbackKind(item: MediaItem): "video" | "audio" | null {
+function playbackKind(item: MediaItem): "video" | "audio" | "youtube" | null {
+  if (item.sourceType === "YOUTUBE") {
+    return item.mediaType === "VIDEO" && youtubeVideoId(item.sourceUrl) ? "youtube" : null;
+  }
   if (item.sourceType !== "LOCAL_FILE") return null;
   if (item.mediaType === "VIDEO") return "video";
   if (item.mediaType === "AUDIO") return "audio";
@@ -177,11 +184,11 @@ export default function LibraryView() {
                 <li className="library-item" key={item.id}>
                   <div className="library-item-row">
                     <span className="library-item-icon" aria-hidden="true">
-                      {kind === "video" ? <Film size={21} strokeWidth={1.7} /> : kind === "audio" ? <Music2 size={21} strokeWidth={1.7} /> : <LibraryBig size={21} strokeWidth={1.7} />}
+                      {kind === "video" || kind === "youtube" ? <Film size={21} strokeWidth={1.7} /> : kind === "audio" ? <Music2 size={21} strokeWidth={1.7} /> : <LibraryBig size={21} strokeWidth={1.7} />}
                     </span>
                     <div className="library-item-info">
                       <h2>{item.title}</h2>
-                      <p>{item.mediaType === "VIDEO" ? "Wideo" : item.mediaType === "AUDIO" ? "Audio" : "Materiał"}</p>
+                      <p>{kind === "youtube" ? "YouTube" : item.mediaType === "VIDEO" ? "Wideo" : item.mediaType === "AUDIO" ? "Audio" : "Materiał"}</p>
                       {worksForRecording.length > 0 ? (
                         <div className="library-work-links">
                           {worksForRecording.map((work) => (
@@ -223,6 +230,11 @@ export default function LibraryView() {
                         >
                           Twoja przeglądarka nie obsługuje odtwarzania audio.
                         </audio>
+                      ) : kind === "youtube" ? (
+                        <YouTubeEmbed
+                          videoId={youtubeVideoId(selectedItem.sourceUrl) ?? ""}
+                          title={selectedItem.title}
+                        />
                       ) : (
                         <video
                           key={selectedItem.id}

@@ -12,6 +12,7 @@ import EditorialPages from "./EditorialPages";
 import FeaturedVideoCard from "./FeaturedVideoCard";
 import LibraryView from "./LibraryView";
 import PoetsPreview from "./PoetsPreview";
+import YouTubeRecommendation from "./YouTubeRecommendation";
 
 type Page = "home" | "library" | "editorial";
 
@@ -162,11 +163,7 @@ export default function App() {
             description="Miejsce na kolejne odkrycia."
             icon={Heart}
           />
-          <div className="collection-placeholder">
-            <EmptyCollection>
-              Ta sekcja zostanie wypełniona na podstawie rzeczywistych materiałów.
-            </EmptyCollection>
-          </div>
+          <YouTubeRecommendation />
         </section>
         </main>
       ) : currentPage === "library" ? (
