@@ -561,3 +561,168 @@ code {
     scroll-behavior: auto;
   }
 }
+
+
+/* Stage 8: library browsing extends the existing paper/olive visual system. */
+.library-heading {
+  padding: 42px 0 26px;
+}
+
+.library-heading h1 {
+  margin-bottom: 10px;
+}
+
+.library-count {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.library-feedback {
+  margin: 14px 0;
+  padding: 24px;
+  border: 1px dashed var(--line);
+  border-radius: 14px;
+  background: var(--white);
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.library-feedback p {
+  margin: 0 0 12px;
+}
+
+.library-list {
+  display: grid;
+  gap: 12px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.library-item {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--white);
+}
+
+.library-item-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 17px;
+}
+
+.library-item-icon {
+  display: grid;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  color: var(--olive-dark);
+  border-radius: 12px;
+  background: var(--paper-deep);
+}
+
+.library-item-info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.library-item-info h2 {
+  margin: 0 0 5px;
+  font-size: 16px;
+  line-height: 1.35;
+  font-weight: 600;
+}
+
+.library-item-info p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.library-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  padding: 10px 14px;
+  border: 1px solid #c9cbbb;
+  border-radius: 10px;
+  color: var(--olive-dark);
+  background: #e9e8dd;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.library-action:hover:not(:disabled) {
+  background: #dfe1d4;
+}
+
+.library-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.library-unavailable {
+  color: var(--muted);
+  font-size: 11px;
+  text-align: right;
+}
+
+.library-video {
+  padding: 0 16px 16px;
+}
+
+.library-video video {
+  display: block;
+  width: 100%;
+  max-height: 70vh;
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #171a16;
+}
+
+.library-error {
+  margin: 10px 0 0;
+  color: #9b443c;
+  font-size: 13px;
+}
+
+.library-pagination {
+  margin: 20px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.library-pagination span {
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+@media (min-width: 720px) {
+  .library-heading {
+    padding: 58px 0 34px;
+  }
+}
+
+@media (max-width: 420px) {
+  .library-item-row {
+    gap: 9px;
+    padding: 12px;
+  }
+  .library-action {
+    padding: 9px;
+  }
+  .library-pagination {
+    gap: 4px;
+  }
+}
