@@ -1123,7 +1123,7 @@ code {
 
 .catalog-rail-item {
   display: flex;
-  flex: 0 0 clamp(228px, 72vw, 300px);
+  flex: 0 0 clamp(240px, 72vw, 300px);
   min-width: 0;
   scroll-snap-align: start;
 }
@@ -1263,6 +1263,11 @@ code {
 
 .catalog-media-player .youtube-player-note {
   font-size: 11px;
+}
+
+/* YouTube's embedded controls need a usable height in narrow cards. */
+.catalog-media-player .youtube-player iframe {
+  min-height: 200px;
 }
 
 .collection-retry {
