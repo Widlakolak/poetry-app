@@ -688,6 +688,15 @@ code {
   background: #171a16;
 }
 
+.library-audio {
+  padding-top: 4px;
+}
+
+.library-audio audio {
+  display: block;
+  width: 100%;
+}
+
 .library-error {
   margin: 10px 0 0;
   color: #9b443c;

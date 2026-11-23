@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Film, LibraryBig, Play, X } from "lucide-react";
+import { Film, LibraryBig, Music2, Play, X } from "lucide-react";
 
 type MediaItem = {
   id: string;
@@ -43,8 +43,11 @@ function isMediaPage(value: unknown): value is MediaPage {
   );
 }
 
-function isPlayableVideo(item: MediaItem): boolean {
-  return item.mediaType === "VIDEO" && item.sourceType === "LOCAL_FILE";
+function playbackKind(item: MediaItem): "video" | "audio" | null {
+  if (item.sourceType !== "LOCAL_FILE") return null;
+  if (item.mediaType === "VIDEO") return "video";
+  if (item.mediaType === "AUDIO") return "audio";
+  return null;
 }
 
 export default function LibraryView() {
@@ -107,7 +110,7 @@ export default function LibraryView() {
         <p className="eyebrow">ODKRYWAJ NAGRANIA</p>
         <h1>Biblioteka</h1>
         <p className="welcome-copy">
-          Obejrzyj opublikowane materiały w jednym miejscu.
+          Słuchaj i oglądaj opublikowane materiały w jednym miejscu.
         </p>
       </header>
 
@@ -135,14 +138,15 @@ export default function LibraryView() {
           <p className="library-count">Opublikowane materiały: {catalog.totalElements}</p>
           <ul className="library-list">
             {catalog.content.map((item) => {
-              const playable = isPlayableVideo(item);
+              const kind = playbackKind(item);
+              const playable = kind !== null;
               const expanded = selectedId === item.id;
 
               return (
                 <li className="library-item" key={item.id}>
                   <div className="library-item-row">
                     <span className="library-item-icon" aria-hidden="true">
-                      {playable ? <Film size={21} strokeWidth={1.7} /> : <LibraryBig size={21} strokeWidth={1.7} />}
+                      {kind === "video" ? <Film size={21} strokeWidth={1.7} /> : kind === "audio" ? <Music2 size={21} strokeWidth={1.7} /> : <LibraryBig size={21} strokeWidth={1.7} />}
                     </span>
                     <div className="library-item-info">
                       <h2>{item.title}</h2>
@@ -164,20 +168,34 @@ export default function LibraryView() {
                     )}
                   </div>
 
-                  {expanded && selectedItem && playable ? (
-                    <div className="library-video">
-                      <video
-                        key={selectedItem.id}
-                        controls
-                        autoPlay
-                        playsInline
-                        preload="metadata"
-                        src={`/api/v1/media/${encodeURIComponent(selectedItem.id)}/stream`}
-                        aria-label={`Odtwarzanie: ${selectedItem.title}`}
-                        onError={() => setPlaybackError(true)}
-                      >
-                        Twoja przeglądarka nie obsługuje odtwarzania wideo.
-                      </video>
+                  {expanded && selectedItem && kind ? (
+                    <div className={kind === "audio" ? "library-video library-audio" : "library-video"}>
+                      {kind === "audio" ? (
+                        <audio
+                          key={selectedItem.id}
+                          controls
+                          autoPlay
+                          preload="metadata"
+                          src={`/api/v1/media/${encodeURIComponent(selectedItem.id)}/stream`}
+                          aria-label={`Odtwarzanie: ${selectedItem.title}`}
+                          onError={() => setPlaybackError(true)}
+                        >
+                          Twoja przeglądarka nie obsługuje odtwarzania audio.
+                        </audio>
+                      ) : (
+                        <video
+                          key={selectedItem.id}
+                          controls
+                          autoPlay
+                          playsInline
+                          preload="metadata"
+                          src={`/api/v1/media/${encodeURIComponent(selectedItem.id)}/stream`}
+                          aria-label={`Odtwarzanie: ${selectedItem.title}`}
+                          onError={() => setPlaybackError(true)}
+                        >
+                          Twoja przeglądarka nie obsługuje odtwarzania wideo.
+                        </video>
+                      )}
                       {playbackError ? (
                         <p role="alert" className="library-error">
                           Nie udało się odtworzyć nagrania. Spróbuj ponownie.

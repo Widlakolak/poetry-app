@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/media")
 public class MediaStreamController {
 
-    private static final MediaType MP4 = MediaType.parseMediaType("video/mp4");
-
     private final MediaStreamService mediaStreamService;
 
     public MediaStreamController(MediaStreamService mediaStreamService) {
@@ -26,15 +24,15 @@ public class MediaStreamController {
 
     @GetMapping("/{id}/stream")
     public ResponseEntity<Resource> stream(@PathVariable UUID id) {
-        Resource resource = mediaStreamService.getPublishedMp4(id);
+        MediaStreamService.StreamedMedia media = mediaStreamService.getPublishedMedia(id);
 
         // Spring MVC converts valid Range requests to 206 / Content-Range automatically.
         // Keep this response at 200 and return a file-backed Resource.
         return ResponseEntity.ok()
-                .contentType(MP4)
+                .contentType(MediaType.parseMediaType(media.contentType()))
                 .header(HttpHeaders.ACCEPT_RANGES, "bytes")
                 .header("X-Content-Type-Options", "nosniff")
                 .cacheControl(CacheControl.noStore())
-                .body(resource);
+                .body(media.resource());
     }
 }

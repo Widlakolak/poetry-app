@@ -23,6 +23,11 @@ public class MediaStreamService {
     // The Stage 5 importer creates UUID-based storage keys, not user-provided paths.
     private static final Pattern MP4_STORAGE_KEY =
             Pattern.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\\.mp4");
+    private static final Pattern MP3_STORAGE_KEY =
+            Pattern.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\\.mp3");
+
+    public record StreamedMedia(Resource resource, String contentType) {}
+
 
     private final MediaItemRepository mediaItemRepository;
     private final Path mediaDirectory;
@@ -34,18 +39,29 @@ public class MediaStreamService {
         this.mediaDirectory = Path.of(mediaDirectory).toAbsolutePath().normalize();
     }
 
-    public Resource getPublishedMp4(UUID id) {
+    public StreamedMedia getPublishedMedia(UUID id) {
         MediaItem item = mediaItemRepository
                 .findByIdAndPublicationStatus(id, PublicationStatus.PUBLISHED)
                 .orElseThrow(MediaStreamService::notFound);
 
-        if (item.getMediaType() != MediaType.VIDEO
-                || item.getSourceType() != MediaSourceType.LOCAL_FILE) {
+        if (item.getSourceType() != MediaSourceType.LOCAL_FILE) {
+            throw notFound();
+        }
+
+        String contentType;
+        Pattern allowedKey;
+        if (item.getMediaType() == MediaType.VIDEO) {
+            contentType = "video/mp4";
+            allowedKey = MP4_STORAGE_KEY;
+        } else if (item.getMediaType() == MediaType.AUDIO) {
+            contentType = "audio/mpeg";
+            allowedKey = MP3_STORAGE_KEY;
+        } else {
             throw notFound();
         }
 
         String storageKey = item.getStorageKey();
-        if (storageKey == null || !MP4_STORAGE_KEY.matcher(storageKey).matches()) {
+        if (storageKey == null || !allowedKey.matcher(storageKey).matches()) {
             throw notFound();
         }
 
@@ -57,7 +73,7 @@ public class MediaStreamService {
         }
 
         // Unlike InputStreamResource, FileSystemResource supports byte ranges in Spring MVC.
-        return new FileSystemResource(file);
+        return new StreamedMedia(new FileSystemResource(file), contentType);
     }
 
     private static ResourceNotFoundException notFound() {
