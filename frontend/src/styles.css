@@ -271,6 +271,15 @@ h1 {
   opacity: 0.65;
 }
 
+.play-button[href] {
+  text-decoration: none;
+}
+
+.play-button:focus-visible {
+  outline: 2px solid #f5f1e8;
+  outline-offset: 3px;
+}
+
 .play-button:disabled {
   cursor: not-allowed;
 }

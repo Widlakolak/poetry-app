@@ -442,3 +442,58 @@ plan, not an implemented feature.
 
 Only the frontend and README change in this stage; no database migration,
 backend endpoint, Docker mount, Compose, shared Nginx or Cloudflare change.
+
+
+### Stage 11: Library-only playback controls and verified catalog titles
+
+The **Wiersz na dziś** section keeps its existing cover and section order.
+Its action now navigates to `/biblioteka` rather than starting video
+playback on the home page. The **Biblioteka** view is the sole frontend
+location for the local MP3/MP4 playback controls.
+
+The native audio and video players use `controlsList="nodownload"` to
+request removal of the browser-provided Download action. This is a UI
+preference only: browser support is inconsistent, and users can still
+retrieve public stream URLs or save streamed bytes. It is **not DRM**
+and must not be described as copy protection. Existing HTTP Range
+streaming remains available for seek support.
+
+The confirmed volume-3 tracks should display these titles in the
+PostgreSQL `media_item.title` column:
+
+- previously `02 Track 02` → **`Odczepić się`** (track 2);
+- previously `12 Track 12` → **`Siódma, ósma`** (track 12).
+
+These identifications were confirmed against the track listing and by
+the owner. Do not rename the underlying media files, storage keys,
+SHA-256 hashes or media IDs. No database migration or public write
+endpoint is necessary for editing two existing content records.
+
+After successful CI, merge and GHCR publication, deploy **only
+`poetryapp-frontend`** with the existing Compose commands. After the
+frontend is updated, verify the current catalog IDs and old titles on
+the real QNAP database, and make the two title updates in a reviewed,
+transactional, manual `psql` session. Avoid embedding live database
+identifiers into application code or reusable migrations.
+
+The editorial work mapping temporarily recognizes both existing
+catalog titles and the renamed titles, so work-page links remain
+available during the deployment/rename transition. Other recordings
+(including the unverified CD and the short track with a suggestive
+filename) stay unchanged until their contents have been confirmed.
+
+Manual checks:
+1. On the home page, the featured card remains visible and clicking its
+   library icon opens `/biblioteka` without starting playback.
+2. The home page contains no audio or video player; playback starts
+   only within `/biblioteka`.
+3. In supported browsers, MP3 and MP4 players show no native Download
+   action, while play/pause, seek, and volume still work.
+4. After the title transaction, the library displays the two verified
+   titles and the linked detail pages still open.
+5. The existing MP4 and other MP3s remain playable; QNAP services and
+   media files are unchanged.
+
+Only frontend files and README change; no backend, Flyway, database
+schema, Compose, shared Nginx or Cloudflare updates are part of this
+stage.
