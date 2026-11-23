@@ -1037,3 +1037,16 @@ code {
 .recommended-youtube-player > .library-action {
   margin-top: 12px;
 }
+
+/* Stage 16: artist recordings reuse editorial list styles without portraits. */
+.artist-recording-card {
+  align-items: flex-start;
+}
+
+.artist-recording-card > div {
+  min-width: 0;
+}
+
+.artist-recording-card .library-work-link {
+  margin-right: 12px;
+}
