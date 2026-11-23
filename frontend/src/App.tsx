@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   BookOpen,
   GraduationCap,
@@ -9,17 +10,20 @@ import {
   UsersRound,
 } from "lucide-react";
 import FeaturedVideoCard from "./FeaturedVideoCard";
+import LibraryView from "./LibraryView";
+
+type Page = "home" | "library";
 
 type NavigationItem = {
   label: string;
   icon: typeof House;
-  active?: boolean;
+  page?: Page;
 };
 
 const navigation: NavigationItem[] = [
-  { label: "Ekran główny", icon: House, active: true },
+  { label: "Ekran główny", icon: House, page: "home" },
   { label: "Edukacja", icon: GraduationCap },
-  { label: "Biblioteka", icon: LibraryBig },
+  { label: "Biblioteka", icon: LibraryBig, page: "library" },
   { label: "Ulubione", icon: Heart },
   { label: "Szukaj", icon: Search },
 ];
@@ -61,28 +65,39 @@ function EmptyCollection({ children }: { children: string }) {
   );
 }
 
-function BottomNavigation() {
+function BottomNavigation({
+  currentPage,
+  onNavigate,
+}: {
+  currentPage: Page;
+  onNavigate: (page: Page) => void;
+}) {
   return (
     <nav className="bottom-navigation" aria-label="Nawigacja główna">
-      {navigation.map(({ label, icon: Icon, active }) => (
-        <button
-          className={`nav-item${active ? " nav-item-active" : ""}`}
-          type="button"
-          key={label}
-          aria-current={active ? "page" : undefined}
-          aria-disabled={!active}
-          disabled={!active}
-          title={active ? label : `${label} - kolejny etap`}
-        >
-          <Icon size={22} strokeWidth={active ? 2 : 1.7} aria-hidden="true" />
-          <span>{label}</span>
-        </button>
-      ))}
+      {navigation.map(({ label, icon: Icon, page }) => {
+        const active = page === currentPage;
+        return (
+          <button
+            className={`nav-item${active ? " nav-item-active" : ""}`}
+            type="button"
+            key={label}
+            aria-current={active ? "page" : undefined}
+            disabled={!page}
+            onClick={() => page && onNavigate(page)}
+            title={page ? label : `${label} - kolejny etap`}
+          >
+            <Icon size={22} strokeWidth={active ? 2 : 1.7} aria-hidden="true" />
+            <span>{label}</span>
+          </button>
+        );
+      })}
     </nav>
   );
 }
 
 export default function App() {
+  const [currentPage, setCurrentPage] = useState<Page>("home");
+
   return (
     <div className="app-shell">
       <header className="top-bar">
@@ -95,7 +110,8 @@ export default function App() {
         <span className="top-note">Przestrzeń dla słowa</span>
       </header>
 
-      <main className="home-content">
+      {currentPage === "home" ? (
+        <main className="home-content">
         <section className="welcome-block" aria-labelledby="welcome-title">
           <p className="eyebrow">CHWILA DLA POEZJI</p>
           <h1 id="welcome-title">Zatrzymaj się na chwilę.</h1>
@@ -155,14 +171,17 @@ export default function App() {
             </EmptyCollection>
           </div>
         </section>
-      </main>
+        </main>
+      ) : (
+        <LibraryView />
+      )}
 
       <footer className="site-footer">
         <span className="footer-mark" aria-hidden="true">p.</span>
         <p>Nie trzeba się spieszyć. Wystarczy posłuchać.</p>
       </footer>
 
-      <BottomNavigation />
+      <BottomNavigation currentPage={currentPage} onNavigate={setCurrentPage} />
     </div>
   );
 }
