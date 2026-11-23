@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Film, LibraryBig, Music2, Play, X } from "lucide-react";
+import { workForRecordingTitle } from "./editorialContent";
 
 type MediaItem = {
   id: string;
@@ -139,6 +140,7 @@ export default function LibraryView() {
           <ul className="library-list">
             {catalog.content.map((item) => {
               const kind = playbackKind(item);
+              const work = workForRecordingTitle(item.title);
               const playable = kind !== null;
               const expanded = selectedId === item.id;
 
@@ -151,6 +153,11 @@ export default function LibraryView() {
                     <div className="library-item-info">
                       <h2>{item.title}</h2>
                       <p>{item.mediaType === "VIDEO" ? "Wideo" : item.mediaType === "AUDIO" ? "Audio" : "Materiał"}</p>
+                      {work ? (
+                        <a className="library-work-link" href={`/utwory/${work.slug}`}>
+                          O utworze: {work.title}
+                        </a>
+                      ) : null}
                     </div>
                     {playable ? (
                       <button

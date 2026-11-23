@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   BookOpen,
   GraduationCap,
@@ -9,10 +8,11 @@ import {
   Sparkles,
   UsersRound,
 } from "lucide-react";
+import EditorialPages from "./EditorialPages";
 import FeaturedVideoCard from "./FeaturedVideoCard";
 import LibraryView from "./LibraryView";
 
-type Page = "home" | "library";
+type Page = "home" | "library" | "editorial";
 
 type NavigationItem = {
   label: string;
@@ -65,13 +65,7 @@ function EmptyCollection({ children }: { children: string }) {
   );
 }
 
-function BottomNavigation({
-  currentPage,
-  onNavigate,
-}: {
-  currentPage: Page;
-  onNavigate: (page: Page) => void;
-}) {
+function BottomNavigation({ currentPage }: { currentPage: Page }) {
   return (
     <nav className="bottom-navigation" aria-label="Nawigacja główna">
       {navigation.map(({ label, icon: Icon, page }) => {
@@ -83,7 +77,11 @@ function BottomNavigation({
             key={label}
             aria-current={active ? "page" : undefined}
             disabled={!page}
-            onClick={() => page && onNavigate(page)}
+            onClick={() => {
+              if (page) {
+                window.location.assign(page === "home" ? "/" : "/biblioteka");
+              }
+            }}
             title={page ? label : `${label} - kolejny etap`}
           >
             <Icon size={22} strokeWidth={active ? 2 : 1.7} aria-hidden="true" />
@@ -96,7 +94,9 @@ function BottomNavigation({
 }
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<Page>("home");
+  const pathname = window.location.pathname;
+  const currentPage: Page =
+    pathname === "/" ? "home" : pathname === "/biblioteka" ? "library" : "editorial";
 
   return (
     <div className="app-shell">
@@ -137,11 +137,13 @@ export default function App() {
             description="Poznaj ludzi i słowa stojące za utworami."
             icon={BookOpen}
           />
-          <div className="collection-placeholder">
-            <EmptyCollection>
-              Katalog poetów pojawi się, gdy dostępne będą dane twórców.
-            </EmptyCollection>
-          </div>
+          <a className="poet-preview" href="/poeci/miron-bialoszewski">
+            <span className="poet-preview-mark" aria-hidden="true"><BookOpen size={23} strokeWidth={1.5} /></span>
+            <span>
+              <strong>Miron Białoszewski</strong>
+              <small>1922–1983 · Poznaj twórczość i utwory w bibliotece</small>
+            </span>
+          </a>
         </section>
 
         <section className="collection-section" aria-labelledby="artists-title">
@@ -172,8 +174,10 @@ export default function App() {
           </div>
         </section>
         </main>
-      ) : (
+      ) : currentPage === "library" ? (
         <LibraryView />
+      ) : (
+        <EditorialPages pathname={pathname} />
       )}
 
       <footer className="site-footer">
@@ -181,7 +185,7 @@ export default function App() {
         <p>Nie trzeba się spieszyć. Wystarczy posłuchać.</p>
       </footer>
 
-      <BottomNavigation currentPage={currentPage} onNavigate={setCurrentPage} />
+      <BottomNavigation currentPage={currentPage} />
     </div>
   );
 }
