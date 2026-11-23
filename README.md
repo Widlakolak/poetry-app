@@ -1,11 +1,22 @@
 # Poetry App
 ### Cyfrowa przestrzeń do słuchania, czytania i odkrywania poezji
 
+**Status: demonstracyjne MVP zaimplementowane w repozytorium (etapy do 18).**
+Kod wyszukiwarki z etapu 18 został scalony do `main`, a CI i publikacja
+obrazów Docker w GHCR zakończyły się powodzeniem. **Nie oznacza to jeszcze
+potwierdzenia wdrożenia najnowszego frontendu na QNAP ani zakończenia testów
+przeglądarkowych i weryfikacji praw do materiałów.**
+
+Szybka orientacja: [zakres MVP](#zakres-demonstracyjnego-mvp) ·
+[czego nie ma w MVP](#poza-zakresem-mvp) ·
+[checklista demonstracji](#checklista-przed-prezentacją) ·
+[szczegóły wdrożenia](#deployment-qnap).
+
 ## O projekcie
 
 Poetry App to projekt aplikacji cyfrowej, której celem jest przybliżanie poezji współczesnym odbiorcom poprzez nagrania aktorskie, materiały wideo i teksty literackie.
 
-Projekt zakłada połączenie tradycyjnej formy literackiej z prostym, nowoczesnym sposobem korzystania z treści. Użytkownik będzie mógł nie tylko słuchać interpretacji wierszy, lecz także śledzić ich tekst podczas odtwarzania i odkrywać twórczość poetów oraz aktorów.
+Demonstracyjne MVP łączy nagrania audio i wideo z katalogiem twórców oraz utworów. Użytkownik może słuchać i oglądać opublikowane materiały, przeszukiwać katalog i otwierać powiązane profile. Wyświetlanie pełnych tekstów wierszy i synchronizacja z nagraniami należą do dalszego planu rozwoju.
 
 Istotnym założeniem jest stworzenie spokojnego środowiska odbioru literatury. Aplikacja nie ma konkurować z użytkownikiem o uwagę za pomocą nadmiaru bodźców wizualnych. Jej interfejs ma sprzyjać skupieniu na słowie, głosie i interpretacji.
 
@@ -19,7 +30,7 @@ Projekt ma służyć zarówno osobom, które już interesują się literaturą, 
 
 - **Poezja dostępna na co dzień** - możliwość słuchania i czytania utworów w wygodnej formie cyfrowej.
 - **Interpretacja aktorska** - wykorzystanie głosu, emocji i indywidualnego sposobu odczytania tekstu jako integralnej części doświadczenia literackiego.
-- **Połączenie dźwięku i słowa** - prezentowanie tekstu wiersza podczas odtwarzania nagrania.
+- **Połączenie dźwięku i słowa (dalszy etap)** - prezentowanie tekstu wiersza podczas odtwarzania nagrania; funkcja nie jest częścią obecnego MVP.
 - **Odkrywanie twórców** - stworzenie przestrzeni do poznawania poetów, aktorów i ich interpretacji.
 - **Spokojny interfejs** - ograniczenie zbędnych elementów wizualnych, intensywnych kolorów i rozpraszających mechanizmów.
 - **Dostępność cyfrowa** - rozwijanie aplikacji z myślą o wygodzie korzystania na telefonach i innych urządzeniach.
@@ -37,18 +48,23 @@ Potencjalnymi odbiorcami Poetry App są:
 
 W kolejnych etapach projekt może stać się narzędziem wspierającym działania edukacyjne i popularyzatorskie, w zależności od potrzeb odbiorców i partnerów.
 
-## Jak będzie działać Poetry App?
+## Jak działa demonstracyjne MVP?
 
-Głównym elementem aplikacji będzie ekran z wybranymi materiałami literackimi. Użytkownik znajdzie na nim między innymi:
+Ekran główny zachowuje ustaloną kolejność sekcji:
 
-- **Wiersz na dziś** - wyróżnione nagranie audio lub wideo;
-- **Poeci** - przestrzeń do odkrywania twórczości literackiej;
-- **Artyści** - materiały związane z interpretacjami aktorskimi;
-- **Wybrane dla Ciebie** - kolekcję polecanych materiałów.
+- **Wiersz na dziś** — duża karta z wyróżnionym filmem MP4 i odtwarzaniem na miejscu (obecnie wybrany materiał z katalogu, bez automatycznej codziennej rotacji);
+- **Poeci** — poziomo przewijane kafelki prowadzące do profili i utworów;
+- **Artyści** — poziomo przewijane kafelki prowadzące do profili wykonawców i przypisanych im nagrań;
+- **Wybrane dla Ciebie** — poziomy przegląd najnowszych opublikowanych materiałów z możliwością odtwarzania, **bez personalizacji algorytmicznej**.
 
-Aplikacja będzie zawierać również nawigację umożliwiającą przejście do biblioteki materiałów i wyszukiwania.
+Dolna nawigacja otwiera **Ekran główny**, **Bibliotekę** (`/biblioteka`)
+i **Szukaj** (`/szukaj`). Biblioteka przegląda opublikowane nagrania z
+paginacją; wyszukiwarka znajduje nagrania, utwory, poetów i artystów w
+katalogu pobranym z API. Dostępne materiały MP3, MP4 i YouTube można
+odtwarzać przez istniejące odtwarzacze.
 
-Jednym z ważnych kierunków rozwoju jest wyświetlanie tekstu zsynchronizowanego z nagraniem. Dzięki temu odbiorca będzie mógł jednocześnie słuchać interpretacji i śledzić kolejne wersy utworu.
+Przyciski **Ulubione** i **Edukacja** są widoczne, lecz nieaktywne.
+Synchronizacja tekstu z nagraniem i tryb karaoke pozostają planem rozwoju.
 
 ## Kierunek wizualny
 
@@ -60,7 +76,7 @@ Inspiracja dotyczy filozofii projektowania i charakteru interfejsu, a nie kopiow
 
 ## Etapy rozwoju
 
-### Etap 1 - Minimalna wersja aplikacji
+### Etap 1 - Minimalna wersja aplikacji (MVP: kod zrealizowany)
 
 - przygotowanie mobilnego interfejsu;
 - prezentacja dostarczonych nagrań audio i wideo;
@@ -68,21 +84,21 @@ Inspiracja dotyczy filozofii projektowania i charakteru interfejsu, a nie kopiow
 - biblioteka i wyszukiwanie;
 - przygotowanie architektury do przechowywania metadanych i tekstów.
 
-### Etap 2 - Tekst towarzyszący nagraniu
+### Etap 2 - Tekst towarzyszący nagraniu (plan; model danych przygotowany)
 
 - prezentowanie tekstu podczas odtwarzania;
 - synchronizacja fragmentów tekstu z nagraniem;
 - możliwość poprawiania transkrypcji;
 - rozwijanie opisów materiałów i informacji o twórcach.
 
-### Etap 3 - Rozwój funkcji edukacyjnych i kulturalnych
+### Etap 3 - Rozwój funkcji edukacyjnych i kulturalnych (częściowo)
 
 - rozbudowa katalogu literackiego;
 - rozwój prezentacji poetów i aktorów;
 - przygotowanie możliwości wykorzystania aplikacji podczas zajęć edukacyjnych;
 - poszukiwanie partnerstw z twórcami i instytucjami kultury.
 
-### Etap 4 - Napisy zsynchronizowane z odtwarzaniem
+### Etap 4 - Napisy zsynchronizowane z odtwarzaniem (plan)
 
 - wyświetlanie zatwierdzonego tekstu wiersza lub transkrypcji jako napisów podczas odtwarzania MP3 i MP4;
 - powiązanie fragmentów tekstu ze znacznikami czasu, aby aktualny wers lub wypowiedź pojawiała się dokładnie w odpowiednim momencie;
@@ -95,55 +111,89 @@ Napisy „w czasie rzeczywistym” oznaczają tutaj synchronizację z bieżącym
 
 Kolejne etapy będą zależały od rezultatów prac nad pierwszą wersją, potrzeb odbiorców oraz dostępnych zasobów.
 
-### Planowany etap UX — kafelki z przewijaniem poziomym
+### Zrealizowany etap UX — poziome kafelki (etap 17)
 
-W kolejnym, osobno zatwierdzanym etapie rozwoju interfejsu zmienić sposób
-prezentacji elementów w sekcjach strony głównej **Poeci**, **Artyści** oraz
-**Wybrane dla Ciebie** (i ewentualnych przyszłych sekcjach zawierających listy
-rekordów):
+Poeci, Artyści oraz Wybrane dla Ciebie mają poziomo przewijane kafelki:
+obsługa gestów na telefonie, przewijanie i przyciski na desktopie,
+klawiatura, `scroll-snap` oraz stany loading/empty/error.
+Kafelki prezentują wyłącznie dane katalogowe, bez fikcyjnych zdjęć
+czy opisów. Karta Wiersz na dziś pozostaje odrębna i duża.
 
-- Zamiast zwykłej listy lub pojedynczego wiersza wyświetlać **kafelki (karty)**
-  ułożone w jednym poziomym rzędzie, tak aby było widać fragment kolejnej karty.
-- Umożliwić **przesuwanie lewo–prawo**: gestem przesunięcia na telefonach,
-  przewijaniem poziomym na komputerach oraz dostępnymi przyciskami
-  **poprzedni/następny**. Dodać obsługę klawiatury i czytelny stan fokusu.
-- Na kafelku prezentować wyłącznie dane dostępne w katalogu (np. nazwę
-  poety/artysty, tytuł materiału, rodzaj nagrania). Portrety, miniatury
-  i opisy pokazywać tylko wtedy, gdy istnieją prawdziwe dane i prawo do ich
-  użycia; w przeciwnym razie użyć prostego, neutralnego elementu graficznego.
-- Kliknięcie kafelka ma prowadzić do właściwej podstrony lub materiału;
-  **odtwarzanie na stronie głównej i w Bibliotece ma pozostać dostępne**.
-  Nie włączać automatycznego przesuwania ani samoczynnego odtwarzania.
-- Zachować kolejność sekcji **Wiersz na dziś → Poeci → Artyści →
-  Wybrane dla Ciebie**. Wyróżniona karta **Wiersz na dziś** pozostaje
-  osobnym dużym elementem z odtwarzaczem, a nie częścią karuzeli.
-- Dostosować szerokość kart i liczbę widocznych elementów do telefonu
-  i komputera, bez poziomego przewijania całej strony. Zapewnić stany
-  ładowania, pustej listy i błędu API oraz poprawne zachowanie przy
-  jednym kafelku.
-
-**Status: Etap 17 — PR scalony; właściciel potwierdził wygląd na telefonie.**
-Etap 16 podłączył dynamiczną sekcję **Artyści**, a Etap 17 wprowadził
-przewijane poziomo karty do trzech sekcji na stronie głównej.
-Etap 18 przygotowuje działające wyszukiwanie katalogu.
-
-
+**Status:** etap 17 scalony z `main`; wygląd na telefonie potwierdzony przez
+właściciela projektu. Szczegółowy opis znajduje się w
+[historii etapu 17](#stage-17-swipeable-catalog-cards-on-the-home-page-frontend-only).
 
 ## Technologia i utrzymanie
 
-Projekt zakłada wykorzystanie otwartych i powszechnie stosowanych technologii, w tym Java, Spring Boot, React i TypeScript.
+Backend jest napisany w Java 21 i Spring Boot, a frontend w React, TypeScript
+i Vite. PostgreSQL przechowuje katalog i metadane; Flyway zarządza schematem.
+Nagrania lokalne są przechowywane na QNAP poza bazą danych, repozytorium i
+obrazami aplikacji.
 
-Planowana architektura umożliwi oddzielenie interfejsu użytkownika od warstwy odpowiedzialnej za katalog materiałów, metadane i teksty. Pliki multimedialne będą przechowywane niezależnie od kodu aplikacji.
-
-Automatyzacja budowania i wdrażania ma ułatwić utrzymanie projektu, aktualizowanie oprogramowania i dodawanie nowych materiałów bez konieczności przebudowy całej aplikacji.
+Usługi działają w osobnym projekcie Docker Compose, korzystając z istniejącego
+Nginx i Cloudflare Tunnel. GitHub Actions testuje i publikuje obrazy do GHCR.
+Dodanie nagrania nie wymaga przebudowy obrazów.
 
 Projekt jest rozwijany z myślą o lekkiej infrastrukturze serwerowej i kontrolowaniu kosztów utrzymania.
 
 ## Status projektu
 
-Poetry App znajduje się na etapie przygotowania nowej wersji MVP. Obecny etap obejmuje doprecyzowanie założeń, projekt interfejsu i architektury oraz przygotowanie podstaw do dalszego rozwoju.
+**Funkcjonalny zakres demonstracyjnego MVP jest zamknięty po etapie 18.**
+Zrealizowano implementację interfejsu, katalogu, odtwarzania i wyszukiwania.
+Etap 17 został sprawdzony na telefonie przez właściciela projektu;
+PR #18 został scalony, testy CI przeszły i obraz frontendu został
+opublikowany. Ostatnie wdrożenie na QNAP, testy końcowe na realnej stronie
+oraz prawa do publicznego udostępniania materiałów **nie zostały tu
+niezależnie potwierdzone**.
 
-Opisane funkcje i etapy rozwoju przedstawiają założenia projektu, a nie deklarację, że wszystkie elementy zostały już wdrożone.
+### Zakres demonstracyjnego MVP
+
+| Obszar | Dostarczona funkcja |
+| --- | --- |
+| Ekran główny | Wiersz na dziś, Poeci, Artyści, Wybrane dla Ciebie |
+| Nawigacja | Działające Ekran główny, Biblioteka i Szukaj |
+| Katalog | Opublikowane nagrania, profile poetów i wykonawców, strony utworów |
+| Odtwarzanie | MP3 i MP4 z QNAP (HTTP Range), osadzanie YouTube z linkiem do źródła |
+| Odkrywanie | Poziome kafelki, przeglądanie biblioteki, wyszukiwanie po metadanych |
+| Dane | Read-only API i PostgreSQL; identyfikatory i przypisania z katalogu |
+| Dostępność | Responsywny layout, kontrolki nawigacji klawiaturą i stany błędów |
+
+Wyszukiwanie działa po nazwach i tytułach z opublikowanego katalogu;
+nie indeksuje zawartości nagrań, transkrypcji ani całego internetu.
+Wybór „Wybrane dla Ciebie” jest przeglądem katalogu, a nie systemem rekomendacji.
+
+### Poza zakresem MVP
+
+- **Teksty wierszy podczas odtwarzania, napisy zsynchronizowane i karaoke** —
+  brak działającego interfejsu; przygotowane tabele transkrypcji nie oznaczają
+  gotowej funkcji.
+- **Edycja i zatwierdzanie transkrypcji** — brak narzędzia redakcyjnego.
+- **Ulubione** — przycisk w nawigacji jest nieaktywny; brak zapisywania wyborów.
+- **Edukacja** — przycisk w nawigacji jest nieaktywny; nie ma modułu edukacyjnego.
+- **Logowanie, synchronizacja danych między urządzeniami, automatyczne
+  rekomendacje i rozbudowany panel zarządzania katalogiem** — nie wchodzą do MVP.
+
+Powyższe pomysły pozostają w roadmapie. Nie blokują demonstracji
+podstawowego scenariusza: znajdź twórcę lub nagranie, otwórz opis i odtwórz.
+
+### Checklista przed prezentacją
+
+- [x] Zaimplementowano zakres etapów do 18, w tym wyszukiwanie.
+- [x] Etap 17 sprawdzony wizualnie na telefonie przez właściciela.
+- [x] PR #18 scalony do `main`; CI i publikacja obrazów GHCR zakończone sukcesem.
+- [ ] Potwierdzić, że QNAP używa obrazu frontendu zawierającego etap 18.
+- [ ] Przetestować `/szukaj` na telefonie: nazwiska, tytuły bez polskich
+      znaków, brak wyników, linki do profili i odtwarzanie MP3/MP4/YouTube.
+- [ ] Sprawdzić po wdrożeniu stronę główną, poziome kafelki, Bibliotekę,
+      przewijanie nagrań i odświeżanie podstron.
+- [ ] Ustalić prawa do każdego materiału dostępnego w demonstracji
+      (w tym nagrań komercyjnych); nie zakładać, że sam opis lub
+      `controlsList="nodownload"` stanowi zabezpieczenie praw.
+- [ ] Uzgodnić zakres i odbiorców demonstracji; nie przedstawiać
+      funkcji z przyszłej roadmapy jako już wdrożonych.
+
+Ostatni opublikowany obraz nie jest równoznaczny z jego wdrożeniem.
+Dokument nie potwierdza wyniku testów użytkowych po etapie 18.
 
 ## Kierunek długofalowy
 
@@ -153,6 +203,13 @@ Najważniejszym celem pozostaje stworzenie prostego narzędzia, które pozwala s
 
 
 ## Deployment (QNAP)
+
+Poniższa sekcja zawiera **historię technicznych etapów 5–18** wraz z
+instrukcjami i kryteriami odbioru obowiązującymi w chwili ich realizacji.
+W szczególności ograniczenie odtwarzania wyłącznie do Biblioteki z etapu 11
+zostało zniesione w etapie 15, a proste listy twórców z etapu 16 zostały
+zastąpione poziomymi kafelkami w etapie 17. **Aktualny zakres** opisano
+wyżej w „Zakresie demonstracyjnego MVP”.
 
 The deployment uses a separate Compose project and the existing Docker network shared with the current Nginx and Cloudflare Tunnel. It does not define another reverse proxy, tunnel, or host port mapping.
 
@@ -478,7 +535,11 @@ Only the frontend and README change in this stage; no database migration,
 backend endpoint, Docker mount, Compose, shared Nginx or Cloudflare change.
 
 
-### Stage 11: Library-only playback controls and verified catalog titles
+### Stage 11: Library-only playback controls and verified catalog titles (historical)
+
+**Historical snapshot:** This restriction was superseded by Stage 15,
+which restored inline playback on the home screen. Do not treat this stage
+as a description of the current user interface.
 
 The **Wiersz na dziś** section keeps its existing cover and section order.
 Its action now navigates to `/biblioteka` rather than starting video
@@ -581,6 +642,14 @@ read these persisted records instead of hardcoded title matches.
 **Rights:** linking descriptive metadata does not imply permission to
 publicly distribute a text, performance, or recorded album.
 
+
+### Stage 13: Verified catalog data population (manual, completed)
+
+After the schema work in Stage 12, the first confirmed creator and two
+Białoszewski literary works were entered and linked to verified catalog
+recordings in PostgreSQL. This was a **reviewed manual data operation**, not
+a seed migration or a public write API. Further attributions require
+independent confirmation; see Stage 14 for the API-backed presentation.
 
 ### Stage 14: Read published poet and work pages from PostgreSQL via API
 
@@ -746,8 +815,9 @@ Cloudflare or other QNAP services in this stage.
 
 The existing home **Artyści** section now fetches the real list of creators
 credited as `ARTIST` through `GET /api/v1/creators?role=ARTIST`.
-Artists are shown using the current simple creator row style, matching
-**Poeci**, with a profile link at `/artysci/{name-based-slug}`.
+In Stage 16, artists used a simple creator row, matching **Poeci**,
+with a profile link at `/artysci/{name-based-slug}`.
+Stage 17 subsequently replaced both lists with horizontal cards.
 
 To show an artist's actual recordings without guessing from their name or
 the media title, the backend adds the read-only endpoint:
@@ -770,8 +840,8 @@ For the first confirmed data, `Anthony Hopkins` should appear at
 reading. Artist and recording identifiers come from the API, not hardcoded
 into React.
 
-This stage does not introduce the planned horizontal/swipeable tiles;
-that remains a separately scoped UI stage recorded above. The existing
+Stage 16 did not yet introduce horizontal/swipeable tiles;
+they were implemented in Stage 17. The existing
 home section order, **Wiersz na dziś** MP4 playback, YouTube recommendations,
 Biblioteka playback, and native `nodownload` UI settings remain unchanged.
 
@@ -871,7 +941,8 @@ docker compose --env-file .env -f compose.yaml ps
 4. Tab onto a rail itself, press Arrow Left/Right and Home/End; then tab
    into a card link or Play button. Native keyboard activation and
    player keyboard controls must still work.
-5. Current dataset has **two poets, one artist, six media items**:
+5. At the Stage 17 acceptance test, the dataset had **two poets, one artist,
+   six media items** (a historical snapshot, not a fixed catalog size):
    verify T. S. Eliot, Miron Białoszewski, Anthony Hopkins, and
    published YouTube, MP3, and MP4 cards with no fabricated associations.
 6. Open a YouTube card and use the official iframe; close it and confirm
