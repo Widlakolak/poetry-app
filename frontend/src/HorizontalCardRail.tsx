@@ -118,7 +118,7 @@ export default function HorizontalCardRail({ labelledBy, label, items }: Horizon
         ref={trackRef}
         className="catalog-rail-track"
         aria-labelledby={labelledBy}
-        tabIndex={0}
+        tabIndex={position.overflow ? 0 : -1}
         onKeyDown={onTrackKeyDown}
       >
         {items.map((item) => (
