@@ -121,7 +121,7 @@ The Compose file uses a relative bind mount for PostgreSQL data, so the persiste
 
 `/share/CACHEDEV1_DATA/Container/poetryapp/postgres-data`
 
-Media and import directories are not mounted into these containers at this stage. The current backend does not implement media streaming or import processing.
+The Compose deployment mounts `incoming` read-only and `media` read-write into the backend. The import command and MP4 streaming endpoint use those mounts.
 
 ### Initial configuration
 
@@ -187,3 +187,44 @@ playback are validated in the streaming stage, not assumed by the importer.
 endpoint yet, no media directory exposed by Nginx, and no automatic scanning.
 Do not run the command until the PR has passed CI, been merged, and the new
 backend image has been published and deployed. Do not use `docker compose down -v`.
+
+### Stage 6: MP4 streaming with HTTP Range
+
+The backend serves **published local MP4** files from the existing `media`
+mount via `GET /api/v1/media/{id}/stream`. Files remain outside Docker
+images and Git; the public API never exposes a storage key or file path.
+Only records marked `PUBLISHED` with `LOCAL_FILE` and `VIDEO` can stream.
+Unknown/unpublished records, unavailable files, and invalid storage keys
+return 404.
+
+Spring MVC's built-in Resource handling supports HTTP byte-range requests.
+The endpoint uses a `FileSystemResource`, not an `InputStreamResource`, so a
+video player can seek without copying the entire file into Java heap memory.
+The frontend player will be connected in the next, separate stage.
+
+After reviewing and merging this stage, let GitHub Actions publish the backend
+image; then update **only the Poetry App backend** on QNAP:
+
+```sh
+cd /share/CACHEDEV1_DATA/Container/poetryapp
+docker compose --env-file .env -f compose.yaml pull poetryapp-backend
+docker compose --env-file .env -f compose.yaml up -d --no-deps poetryapp-backend
+```
+
+Once the backend is ready, verify the imported video's byte ranges through
+the existing public domain (without downloading the whole 572 MB):
+
+```sh
+curl -sS -o /dev/null -D - \
+  -H 'Range: bytes=0-1023' \
+  https://workdone.qzz.io/api/v1/media/576a370b-2fb0-4ade-8e80-9d99a1fa5313/stream
+```
+
+Expected: `206 Partial Content`, `Content-Range: bytes 0-1023/TOTAL`,
+`Content-Type: video/mp4` and `Accept-Ranges: bytes`. Also test a
+request near the end of the file and an unknown UUID (404).
+
+No new mounts, Nginx configuration, Cloudflare Tunnel, database migrations,
+or frontend changes are needed in this stage. Nginx continues to reverse-proxy
+`/api/` to `poetryapp-backend` and retains the WorkDone Discord endpoint
+exception. Avoid manually modifying file permissions.

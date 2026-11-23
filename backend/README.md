@@ -55,3 +55,14 @@ Run as a one-off container with `--spring.main.web-application-type=none` and
 `--app.import.filename=...` plus `--app.import.title=...`. The command is
 inactive during ordinary server startup. See the root README for the exact
 QNAP command and mount paths.
+
+## Published MP4 streaming (Stage 6)
+
+`GET /api/v1/media/{id}/stream` returns a `FileSystemResource` for a
+published local MP4. Spring MVC automatically supports `Range` (206 Partial
+Content) with this resource type. Only the stored file key, validated as a
+UUID-based MP4 basename, is resolved under the configured media directory;
+path traversal and symbolic links are rejected. Missing or unpublished media
+return 404. The endpoint uses the existing QNAP media mount with no public
+filesystem path, no Nginx media alias, no extra dependencies, and no new
+transcoding service.

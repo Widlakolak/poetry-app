@@ -117,6 +117,7 @@ public class MediaItem {
     public String getSourceUrl() { return sourceUrl; }
     public Long getDurationMs() { return durationMs; }
     public PublicationStatus getPublicationStatus() { return publicationStatus; }
+    public String getStorageKey() { return storageKey; }
     public TranscriptStatus getTranscriptStatus() { return transcriptStatus; }
     public Instant getPublishedAt() { return publishedAt; }
 
