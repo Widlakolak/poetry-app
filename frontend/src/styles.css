@@ -956,3 +956,37 @@ code {
     align-items: flex-start;
   }
 }
+
+/* Stage 14: list styles for database-backed poets and recordings. */
+.poet-preview-list {
+  display: grid;
+  gap: 12px;
+}
+
+.library-work-links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+}
+
+.editorial-recordings {
+  list-style: none;
+  margin: 0 0 20px;
+  padding: 0;
+}
+
+.editorial-recordings li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+}
+
+.editorial-recordings li span {
+  color: var(--muted);
+  font-size: 12px;
+}

@@ -11,6 +11,7 @@ import {
 import EditorialPages from "./EditorialPages";
 import FeaturedVideoCard from "./FeaturedVideoCard";
 import LibraryView from "./LibraryView";
+import PoetsPreview from "./PoetsPreview";
 
 type Page = "home" | "library" | "editorial";
 
@@ -137,13 +138,7 @@ export default function App() {
             description="Poznaj ludzi i słowa stojące za utworami."
             icon={BookOpen}
           />
-          <a className="poet-preview" href="/poeci/miron-bialoszewski">
-            <span className="poet-preview-mark" aria-hidden="true"><BookOpen size={23} strokeWidth={1.5} /></span>
-            <span>
-              <strong>Miron Białoszewski</strong>
-              <small>1922–1983 · Poznaj twórczość i utwory w bibliotece</small>
-            </span>
-          </a>
+          <PoetsPreview />
         </section>
 
         <section className="collection-section" aria-labelledby="artists-title">

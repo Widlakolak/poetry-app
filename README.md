@@ -546,3 +546,64 @@ read these persisted records instead of hardcoded title matches.
 
 **Rights:** linking descriptive metadata does not imply permission to
 publicly distribute a text, performance, or recorded album.
+
+
+### Stage 14: Read published poet and work pages from PostgreSQL via API
+
+The first creator and two works have been verified and inserted manually in
+the production database. The existing read-only endpoints provide their
+published metadata and recording associations:
+
+- `GET /api/v1/creators?role=POET` — published poet preview and profile data
+  (the current creator endpoint selects poets with a verified POET credit);
+- `GET /api/v1/works` — published works, authors, and recording UUIDs;
+- `GET /api/v1/works/{slug}` — the work detail and published recordings.
+
+The frontend now builds the **Poeci** home-screen preview and the author/work
+detail pages from these APIs. The Biblioteka's **O utworze** links are based
+on `recordings[].id`, **not media titles**. All endpoints are paginated;
+the client retrieves every published page with a request size of 100.
+
+The static `editorialContent.ts` contains only separately sourced context,
+album-track description, bibliography, and historical years for the two
+verified Białoszewski works/profile. It no longer assigns work/media
+relationships or duplicates production titles and biographies. The displayed
+recording list comes only from the published API data. No invented performer
+credits, full poem texts, or new stream URLs are introduced.
+
+**Current author URL limitation:** the creator API has no slug field. The
+frontend derives an author path from the creator's display name (including
+Polish letters). This preserves `/poeci/miron-bialoszewski` without hardcoded
+UUIDs. For a larger multilingual catalog or author-name changes, persistent
+slugs will require an explicit backend migration/review.
+
+**Read failure handling:** detail pages show loading, 404 and API-error states
+rather than showing stale/hardcoded metadata. The library remains playable if
+loading work associations fails, with a retry action for the missing links.
+
+Only frontend sources and README change. No Flyway migration, backend change,
+media reimport, QNAP mount, Nginx or Cloudflare change is required.
+
+After CI succeeds and the PR is merged, wait for a successful GHCR publish
+and deploy **only Poetry App's frontend**:
+
+```sh
+cd /share/CACHEDEV1_DATA/Container/poetryapp
+docker compose --env-file .env -f compose.yaml pull poetryapp-frontend
+docker compose --env-file .env -f compose.yaml up -d --no-deps poetryapp-frontend
+docker compose --env-file .env -f compose.yaml ps
+```
+
+Manual verification:
+1. Home screen sections retain their order; **Poeci** lists Miron Białoszewski
+   from the API and links to `/poeci/miron-bialoszewski`.
+2. The profile displays the biography from the creator API and two works from
+   the published works API.
+3. `/utwory/odczepic-sie` and `/utwory/siodma-osma` load the correct
+   titles, author and linked MP3 recordings from the work detail API.
+4. Each of the two MP3s in **Biblioteka** shows the correct **O utworze**
+   link, while other recordings have no invented work association.
+5. Audio/video playback remains available **only inside Biblioteka** and
+   native download UI is hidden in supported browsers.
+6. Reloading nested routes works; unknown work slugs return the in-app 404.
+7. With a failed `/api/v1/works` request, the library still plays recordings.
