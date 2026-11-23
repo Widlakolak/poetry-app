@@ -1290,3 +1290,199 @@ code {
     padding: 15px;
   }
 }
+
+
+/* Stage 18 — catalog search; same calm visual language as the library. */
+.search-content {
+  padding-bottom: 24px;
+}
+
+.search-form {
+  max-width: 720px;
+  margin-bottom: 24px;
+}
+
+.search-form label {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.search-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 54px;
+  padding: 0 14px;
+  border: 1px solid #c9cbbb;
+  border-radius: 12px;
+  color: var(--olive-dark);
+  background: var(--white);
+}
+
+.search-input-wrap:focus-within {
+  outline: 2px solid var(--olive-dark);
+  outline-offset: 2px;
+}
+
+.search-input-wrap input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  height: 52px;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+}
+
+.search-input-wrap input::placeholder {
+  color: var(--muted);
+}
+
+.search-clear {
+  display: inline-grid;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  color: var(--olive-dark);
+  background: var(--paper-deep);
+  cursor: pointer;
+}
+
+.search-clear:hover {
+  background: #dfe1d4;
+}
+
+.search-results {
+  max-width: 840px;
+}
+
+.search-group {
+  margin-top: 30px;
+}
+
+.search-group h2 {
+  margin: 0 0 13px;
+  font-size: 21px;
+  letter-spacing: -0.02em;
+}
+
+.search-group h2 span {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.search-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.search-item {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--white);
+}
+
+.search-item-row,
+.search-item-link {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+}
+
+.search-item-link {
+  width: 100%;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.search-item-link:hover {
+  border-color: #aab19e;
+  background: #f8f7f1;
+}
+
+.search-item-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  color: var(--olive-dark);
+  background: var(--paper-deep);
+}
+
+.search-item-info {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.search-item-type {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--olive);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.search-item-info h3,
+.search-item-info strong {
+  display: block;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.45;
+  font-weight: 600;
+}
+
+.search-item-player {
+  padding: 0 16px 16px;
+}
+
+.search-item-player audio,
+.search-item-player video {
+  display: block;
+  width: 100%;
+}
+
+.search-item-player video {
+  max-height: 70vh;
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #171a16;
+}
+
+@media (max-width: 420px) {
+  .search-item-row,
+  .search-item-link {
+    gap: 10px;
+    padding: 12px;
+  }
+  .search-item-icon {
+    flex-basis: 36px;
+    width: 36px;
+    height: 36px;
+  }
+  .search-item-row .library-action {
+    padding: 10px;
+  }
+}
