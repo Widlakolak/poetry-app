@@ -64,6 +64,22 @@ public class CatalogService {
         return PageResponse.from(response);
     }
 
+    public PageResponse<MediaItemResponse> getPublishedCreatorMedia(
+            UUID creatorId, CreatorRole role, int page, int size) {
+        if (!creatorRepository.existsById(creatorId)) {
+            throw new ResourceNotFoundException("Creator not found");
+        }
+
+        PageRequest pageRequest = pageRequest(page, size, Sort.by(
+                Sort.Order.desc("publishedAt"),
+                Sort.Order.asc("title")));
+
+        return PageResponse.from(mediaItemRepository
+                .findPublishedMediaCreditedToCreator(
+                        creatorId, role, PublicationStatus.PUBLISHED, pageRequest)
+                .map(MediaItemResponse::from));
+    }
+
     private PageRequest pageRequest(int page, int size, Sort sort) {
         if (page < 0) {
             throw new IllegalArgumentException("Page must be greater than or equal to zero");

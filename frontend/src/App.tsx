@@ -9,6 +9,7 @@ import {
   UsersRound,
 } from "lucide-react";
 import EditorialPages from "./EditorialPages";
+import ArtistsPreview from "./ArtistsPreview";
 import FeaturedVideoCard from "./FeaturedVideoCard";
 import LibraryView from "./LibraryView";
 import PoetsPreview from "./PoetsPreview";
@@ -52,17 +53,6 @@ function SectionHeading({
           <Icon size={19} strokeWidth={1.7} />
         </span>
       ) : null}
-    </div>
-  );
-}
-
-function EmptyCollection({ children }: { children: string }) {
-  return (
-    <div className="empty-collection">
-      <span className="empty-collection-mark" aria-hidden="true">
-        <BookOpen size={21} strokeWidth={1.6} />
-      </span>
-      <p>{children}</p>
     </div>
   );
 }
@@ -149,11 +139,7 @@ export default function App() {
             description="Odkrywaj różne głosy i interpretacje."
             icon={UsersRound}
           />
-          <div className="collection-placeholder">
-            <EmptyCollection>
-              Katalog artystów pojawi się po podłączeniu biblioteki nagrań.
-            </EmptyCollection>
-          </div>
+          <ArtistsPreview />
         </section>
 
         <section className="collection-section recommended-section" aria-labelledby="recommended-title">

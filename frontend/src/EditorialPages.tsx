@@ -9,6 +9,7 @@ import {
   type WorkRecord,
 } from "./catalogApi";
 import { poet, workForSlug, type EditorialSource } from "./editorialContent";
+import ArtistPage from "./ArtistPage";
 
 function Sources({ sources }: { sources: EditorialSource[] }) {
   return (
@@ -215,6 +216,9 @@ function NotFoundPage() {
 }
 
 export default function EditorialPages({ pathname }: { pathname: string }) {
+  if (pathname.startsWith("/artysci/")) {
+    return <ArtistPage slug={pathname.slice("/artysci/".length)} />;
+  }
   if (pathname.startsWith("/poeci/")) {
     return <PoetPage slug={pathname.slice("/poeci/".length)} />;
   }

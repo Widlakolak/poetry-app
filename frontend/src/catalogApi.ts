@@ -104,6 +104,21 @@ export function fetchPoets(signal: AbortSignal): Promise<CreatorRecord[]> {
   return loadAllPages("/api/v1/creators?role=POET", isCreator, signal);
 }
 
+export function fetchArtists(signal: AbortSignal): Promise<CreatorRecord[]> {
+  return loadAllPages("/api/v1/creators?role=ARTIST", isCreator, signal);
+}
+
+export function fetchArtistRecordings(
+  creatorId: string,
+  signal: AbortSignal,
+): Promise<RecordingRecord[]> {
+  return loadAllPages(
+    "/api/v1/creators/" + encodeURIComponent(creatorId) + "/media?role=ARTIST",
+    isRecording,
+    signal,
+  );
+}
+
 export function fetchWorks(signal: AbortSignal): Promise<WorkRecord[]> {
   return loadAllPages("/api/v1/works", isWork, signal);
 }
