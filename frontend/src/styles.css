@@ -1486,3 +1486,127 @@ code {
     padding: 10px;
   }
 }
+
+/* Stage 19: recording detail with accessible synchronized poem text. */
+.catalog-media-body .catalog-media-play {
+  text-decoration: none;
+}
+
+.recording-detail {
+  padding-bottom: 35px;
+}
+
+.recording-work-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 3px 12px 8px 0;
+  color: var(--olive-dark);
+  font-size: 14px;
+  text-underline-offset: 3px;
+}
+
+.recording-player-panel {
+  max-width: 860px;
+}
+
+.recording-player-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.recording-player-top h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+}
+
+.recording-player-media {
+  width: 100%;
+  max-width: 860px;
+}
+
+.recording-player-media audio,
+.recording-player-media video {
+  display: block;
+  width: 100%;
+}
+
+.recording-player-media video {
+  aspect-ratio: 16 / 9;
+  max-height: 70vh;
+  object-fit: contain;
+  border-radius: 12px;
+  background: #171a16;
+}
+
+.transcript-section {
+  max-width: 860px;
+  margin: 25px 0 18px;
+}
+
+.transcript-section h2 {
+  margin-bottom: 8px;
+  font-size: 21px;
+}
+
+.transcript-note {
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.transcript-lines {
+  height: clamp(220px, 45vh, 420px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-padding-block: 80px;
+  padding: 55px 20px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--white);
+  scrollbar-gutter: stable;
+}
+
+.transcript-line {
+  margin: 0;
+  padding: 10px 13px;
+  border-left: 3px solid transparent;
+  color: #77786e;
+  font-size: clamp(16px, 3vw, 21px);
+  line-height: 1.65;
+  transition: color 150ms, background-color 150ms;
+}
+
+.transcript-line-active {
+  color: var(--ink);
+  background: #eeeede;
+  border-left-color: var(--olive-dark);
+  font-weight: 650;
+}
+
+@media (max-width: 420px) {
+  .recording-player-top .library-action {
+    min-height: 43px;
+  }
+
+  .transcript-lines {
+    padding: 32px 9px;
+  }
+
+  .transcript-line {
+    padding: 9px 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .transcript-line {
+    transition: none;
+  }
+}
