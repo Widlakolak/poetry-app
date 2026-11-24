@@ -8,7 +8,7 @@ ALTER TABLE media_item DROP CONSTRAINT chk_media_source_url;
 ALTER TABLE media_item ADD CONSTRAINT chk_media_source_url CHECK (
     (source_type = 'YOUTUBE' AND source_url IS NOT NULL)
     OR (source_type = 'EXTERNAL_AUDIO' AND media_type = 'AUDIO'
-        AND source_url LIKE 'https://%.archive.org/%')
+        AND (source_url LIKE 'https://%.archive.org/%' OR source_url LIKE 'https://archive.org/%'))
     OR (source_type = 'LOCAL_FILE' AND source_url IS NULL)
 );
 
