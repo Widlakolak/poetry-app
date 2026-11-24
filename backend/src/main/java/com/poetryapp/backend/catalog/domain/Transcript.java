@@ -37,6 +37,9 @@ public class Transcript {
     @Column(name = "full_text", columnDefinition = "text")
     private String fullText;
 
+    @Column(name = "start_offset_ms", nullable = false)
+    private long startOffsetMs;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -53,6 +56,21 @@ public class Transcript {
         this.mediaItem = mediaItem;
         this.languageCode = languageCode;
         this.fullText = fullText;
+    }
+
+    public MediaItem getMediaItem() { return mediaItem; }
+    public String getLanguageCode() { return languageCode; }
+    public String getFullText() { return fullText; }
+    public long getStartOffsetMs() { return startOffsetMs; }
+    public List<TranscriptSegment> getSegments() { return segments; }
+
+    public void setStartOffsetMs(long startOffsetMs) {
+        if (startOffsetMs < 0) throw new IllegalArgumentException("Negative transcript offset");
+        this.startOffsetMs = startOffsetMs;
+    }
+
+    public void addSegment(String text, Long startMs, Long endMs) {
+        segments.add(new TranscriptSegment(this, segments.size(), text, startMs, endMs));
     }
 
     @PrePersist
