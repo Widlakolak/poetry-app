@@ -1,7 +1,7 @@
 # Poetry App
 ### Cyfrowa przestrzeń do słuchania, czytania i odkrywania poezji
 
-**Status: demonstracyjne MVP, etap 19 wdrożony na QNAP i sprawdzony przez właściciela 24.11.2026. Etapy 19.1–19.4 są zmianami w następnym PR.**
+**Status: demonstracyjne MVP, etapy 19–19.4 wdrożone na QNAP według potwierdzenia właściciela. Etap 19.5 — poprawa czytelności Edukacji — przygotowany w PR, przed wdrożeniem.**
 Wdrożenie migracji V4 i V5 potwierdziły logi produkcyjne; właściciel zgłosił poprawne działanie po aktualizacji. Dokładność czasów i prawa do materiałów nadal wymagają osobnej weryfikacji.
 
 Szybka orientacja: [zakres MVP](#zakres-demonstracyjnego-mvp) ·
@@ -1121,7 +1121,7 @@ Etapy 20 i 21 są **w roadmapie, nie zaimplementowane**.
 
 ---
 
-## Etapy 19.1–19.4 — drugi feedback (PR, przed wdrożeniem)
+## Etapy 19.1–19.4 — drugi feedback (wdrożone na QNAP według potwierdzenia właściciela)
 
 - **19.1 Ulubione:** działający przycisk i osobna strona z informacją o wersji MVP; bez pozorowanego zapisywania.
 - **19.2 Edukacja:** Najmłodsi (bez granic wieku), I–III, IV–VI, VII–VIII, liceum/technikum i Warte poznania. Rozwijane listy odróżniają propozycje od wymagań podstawy z 2024 r.; nowe zasady MEN obowiązują stopniowo od września 2026 r. od klas I i IV. To wybór poezji, nie pełna lista obowiązkowa dla każdego rocznika. Link do nagrania pojawia się tylko przy zgodnym opublikowanym utworze i autorze z API.
@@ -1162,3 +1162,47 @@ Sprawdzić migrację V6, zachowanie 254 wcześniejszych segmentów, endpoint
 odnośniki, oba języki na testowym nagraniu (zmiana bez utraty pozycji),
 blokadę prywatnej ścieżki, brak danych, pauzę i przewijanie YouTube/MP3/MP4.
 Nie zmieniać Compose, Nginx, Cloudflare ani plików medialnych.
+
+
+## Etap 19.5 — czytelniejsza Edukacja (frontend)
+
+Redesign na podstawie zaakceptowanej makiety: ciepłe tło, oliwkowe akcenty,
+większy tytuł szeryfowy, obramowana informacja o podstawie programowej i
+linki źródłowe z ikonami. Sześć dotychczasowych kategorii pozostaje w tej samej
+kolejności. Natywne `details/summary` zachowują obsługę klawiatury; otwarty
+nagłówek ma wyróżnione tło i obrócony chevron. Grupy wymagań i propozycji
+mają własne nagłówki, a wiersze czytelne tytuły i nazwiska autorów.
+Dla powtarzających się pozycji „Wybrane wiersze/teksty” nazwisko jest pierwsze.
+
+Przyciski „Słuchaj” / „O utworze” pojawiają się tylko dla istniejącego
+dopasowania z API. Pozycje informacyjne nie udają aktywnych linków.
+Nie zmieniono programu edukacyjnego, treści katalogu ani logiki odtwarzania.
+Wzmocniono również kontrast i aktywny stan wspólnej nawigacji.
+Układ przewiduje szerokości od 320 px, długie nazwiska, zawijanie linków
+i obszary dotyku o wysokości co najmniej 44 px dla działań na stronie Edukacja.
+Nie dodano bibliotek, fontów zewnętrznych, obrazów ani infrastruktury.
+
+### Wdrożenie po zielonym CI, merge i publikacji GHCR
+
+```sh
+cd /share/CACHEDEV1_DATA/Container/poetryapp || exit 1
+docker compose --env-file .env -f compose.yaml pull poetryapp-frontend || exit 1
+docker compose --env-file .env -f compose.yaml up -d --no-deps poetryapp-frontend
+docker compose --env-file .env -f compose.yaml ps
+```
+
+### Odbiór w przeglądarce
+
+1. Otwórz https://workdone.qzz.io/edukacja na telefonie (320–390 px)
+   i komputerze; sprawdź czytelność bez poziomego przewijania.
+2. Rozwiń IV–VI, porównaj układ z makietą, sprawdź pozostałe kategorie,
+   długie tytuły i autorów, zoom 200% oraz Tab/Enter/Spację.
+3. Otwórz „Słuchaj” przy dostępnym nagraniu (np. Pani Twardowska),
+   wróć do Edukacji; sprawdź, że niedostępne pozycje nie mają fałszywych linków.
+4. Odśwież podstronę, sprawdź linki źródłowe oraz pięć zakładek nawigacji.
+   Przy błędzie API lista edukacyjna pozostaje czytelna.
+5. Sprawdź ekran główny, Bibliotekę i odtwarzacz z napisami PL/EN.
+   Nie zmieniamy bazy, plików medialnych, napisów, Nginx ani Cloudflare.
+
+Build CI nie zastępuje wizualnego testu na realnym telefonie. Nie oznaczać
+etapu jako wdrożonego bez potwierdzenia na QNAP.
