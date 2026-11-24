@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowLeft, GraduationCap, Heart } from "lucide-react";
+import { ArrowLeft, BookOpen, ChevronDown, ChevronRight, ExternalLink, GraduationCap, Heart, Pencil, Play } from "lucide-react";
 import { fetchWorks, creatorSlug, type WorkRecord } from "./catalogApi";
 
 type Entry = { author: string; title: string; searchTitle?: string };
@@ -103,27 +103,74 @@ export function EducationPage() {
     const recorded = matches.filter((work) => work.recordings.length > 0);
     return recorded.length === 1 ? recorded[0] : matches.length === 1 ? matches[0] : undefined;
   }
-  return <main className="home-content editorial-content education-page">
-    <a className="editorial-back" href="/"><ArrowLeft size={17} aria-hidden="true" /> Ekran główny</a>
-    <header className="editorial-hero"><p className="eyebrow">POEZJA I EDUKACJA</p><h1>Edukacja</h1>
-      <p>Odkrywaj poezję na każdym etapie życia.</p></header>
-    <section className="editorial-panel">
-      <p>To wybór poezji, nie pełny wykaz lektur ani lista na każdą klasę. Od września 2026 r. nowa podstawa wchodzi stopniowo od klas I i IV; wymagania zależą od rocznika. Poniższe wskazania szkolne opierają się na podstawie z 2024 r., a propozycje nie są obowiązkowe.</p>
-      <p><a href="https://zpe.gov.pl/podstawa-programowa/szkola-podstawowa/jezyk-polski" target="_blank" rel="noreferrer">Podstawa IV–VIII</a> · <a href="https://zpe.gov.pl/podstawa-programowa/szkola-ponadpodstawowa/jezyk-polski" target="_blank" rel="noreferrer">Liceum i technikum</a> · <a href="https://www.gov.pl/web/edukacja/nowe-podstawy-programowe-wychowania-przedszkolnego-i-ksztalcenia-ogolnego-dla-szkoly-podstawowej-wraz-ze-zmianami-w-ramowych-planach-nauczania-dla-publicznych-szkol-podstawowych--rozporzadzenia-podpisane" target="_blank" rel="noreferrer">Zmiany MEN od 2026 r.</a></p>
-      {catalogStatus === "error" ? <p role="status">Katalog jest chwilowo niedostępny. Lista propozycji pozostaje dostępna.</p> : null}
-      {catalogStatus === "loading" ? <p role="status">Sprawdzamy dostępność nagrań…</p> : null}
-    </section>
-    {stages.map((stage) => <details className="editorial-panel education-stage" key={stage.title}>
-      <summary><GraduationCap size={20} aria-hidden="true" /><span><strong>{stage.title}</strong><small>{stage.subtitle}</small></span></summary>
-      {stage.groups.map((group) => <section key={group.title}>
-        <h3>{group.title}</h3>
-        <ul className="education-list">{group.entries.map((entry) => {
-          const work = match(entry);
-          return <li key={entry.author + entry.title}><span><strong>{entry.title}</strong><small>{entry.author}</small></span>
-            {work?.recordings.length ? <a href={work.recordings.length === 1 ? "/nagrania/" + work.recordings[0].id : "/utwory/" + work.slug}>Słuchaj</a>
-              : work ? <a href={"/utwory/" + work.slug}>O utworze</a> : null}</li>;
-        })}</ul>
-      </section>)}
-    </details>)}
-  </main>;
+  return (
+    <main className="home-content editorial-content education-page" aria-labelledby="education-title">
+      <a className="editorial-back" href="/">
+        <ArrowLeft size={18} aria-hidden="true" /> Ekran główny
+      </a>
+      <header className="editorial-hero education-hero">
+        <p className="eyebrow">POEZJA I EDUKACJA</p>
+        <h1 id="education-title">Edukacja</h1>
+        <p className="education-lead">Odkrywaj poezję na każdym etapie życia.</p>
+      </header>
+      <section className="education-info" aria-label="Informacja o podstawie programowej">
+        <p>To wybór poezji, nie pełny wykaz lektur ani lista na każdą klasę. Od września 2026 r. nowa podstawa wchodzi stopniowo od klas I i IV; wymagania zależą od rocznika. Poniższe wskazania szkolne opierają się na podstawie z 2024 r., a propozycje nie są obowiązkowe.</p>
+        <ul className="education-sources">
+          <li><a href="https://zpe.gov.pl/podstawa-programowa/szkola-podstawowa/jezyk-polski" target="_blank" rel="noopener noreferrer">Podstawa IV–VIII <ExternalLink size={14} aria-hidden="true" /></a></li>
+          <li><a href="https://zpe.gov.pl/podstawa-programowa/szkola-ponadpodstawowa/jezyk-polski" target="_blank" rel="noopener noreferrer">Liceum i technikum <ExternalLink size={14} aria-hidden="true" /></a></li>
+          <li><a href="https://www.gov.pl/web/edukacja/nowe-podstawy-programowe-wychowania-przedszkolnego-i-ksztalcenia-ogolnego-dla-szkoly-podstawowej-wraz-ze-zmianami-w-ramowych-planach-nauczania-dla-publicznych-szkol-podstawowych--rozporzadzenia-podpisane" target="_blank" rel="noopener noreferrer">Zmiany MEN od 2026 r. <ExternalLink size={14} aria-hidden="true" /></a></li>
+        </ul>
+        {catalogStatus === "error" ? <p className="education-status" role="status">Katalog jest chwilowo niedostępny. Lista propozycji pozostaje dostępna.</p> : null}
+        {catalogStatus === "loading" ? <p className="education-status" role="status">Sprawdzamy dostępność nagrań…</p> : null}
+      </section>
+      <div className="education-stages">
+        {stages.map((stage) => (
+          <details className="education-stage" key={stage.title}>
+            <summary>
+              <GraduationCap className="education-stage-icon" size={25} strokeWidth={1.7} aria-hidden="true" />
+              <span className="education-stage-heading">
+                <strong>{stage.title}</strong>
+                <small>{stage.subtitle}</small>
+              </span>
+              <ChevronDown className="education-chevron" size={21} strokeWidth={1.8} aria-hidden="true" />
+            </summary>
+            <div className="education-stage-body">
+              {stage.groups.map((group) => {
+                const GroupIcon = group.title.startsWith("Wskazane") ? BookOpen : Pencil;
+                return (
+                  <section className="education-group" key={group.title}>
+                    <h3><GroupIcon size={20} strokeWidth={1.7} aria-hidden="true" /><span>{group.title}</span></h3>
+                    <ul className="education-list">
+                      {group.entries.map((entry) => {
+                        const work = match(entry);
+                        const hasRecording = Boolean(work?.recordings.length);
+                        const href = work ? (work.recordings.length === 1 ? "/nagrania/" + work.recordings[0].id : "/utwory/" + work.slug) : undefined;
+                        const general = entry.title === "Wybrane wiersze" || entry.title === "Wybrane teksty";
+                        return (
+                          <li key={entry.author + entry.title}>
+                            <div className="education-entry-label">
+                              <strong>{general ? entry.author : entry.title}</strong>
+                              <small>{general ? entry.title : entry.author}</small>
+                            </div>
+                            {href ? (
+                              <a className={hasRecording ? "education-action education-action-play" : "education-action"}
+                                href={href}
+                                aria-label={(hasRecording ? "Słuchaj: " : "O utworze: ") + entry.title + " — " + entry.author}>
+                                {hasRecording ? <Play size={15} fill="currentColor" aria-hidden="true" /> : <ChevronRight size={16} aria-hidden="true" />}
+                                {hasRecording ? "Słuchaj" : "O utworze"}
+                              </a>
+                            ) : null}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </section>
+                );
+              })}
+            </div>
+          </details>
+        ))}
+      </div>
+    </main>
+  );
 }
