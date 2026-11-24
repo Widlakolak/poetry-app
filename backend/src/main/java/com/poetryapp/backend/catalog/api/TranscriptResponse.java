@@ -11,6 +11,7 @@ public record TranscriptResponse(
         UUID mediaId,
         String languageCode,
         String fullText,
+        String translatorName,
         TranscriptStatus status,
         long startOffsetMs,
         List<Segment> segments) {
@@ -30,7 +31,8 @@ public record TranscriptResponse(
                 transcript.getMediaItem().getId(),
                 transcript.getLanguageCode(),
                 transcript.getFullText(),
-                transcript.getMediaItem().getTranscriptStatus(),
+                transcript.getTranslatorName(),
+                transcript.getVerificationStatus(),
                 transcript.getStartOffsetMs(),
                 transcript.getSegments().stream()
                         .sorted(Comparator.comparingInt(TranscriptSegment::getSequenceNumber))
