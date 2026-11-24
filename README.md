@@ -1,11 +1,8 @@
 # Poetry App
 ### Cyfrowa przestrzeń do słuchania, czytania i odkrywania poezji
 
-**Status: demonstracyjne MVP (etapy do 18) oraz rozszerzenie po pierwszym feedbacku (etap 19 w osobnej gałęzi/PR).**
-Kod wyszukiwarki z etapu 18 został scalony do `main`, a CI i publikacja
-obrazów Docker w GHCR zakończyły się powodzeniem. **Nie oznacza to jeszcze
-potwierdzenia wdrożenia najnowszego frontendu na QNAP ani zakończenia testów
-przeglądarkowych i weryfikacji praw do materiałów.**
+**Status: demonstracyjne MVP, etap 19 wdrożony na QNAP i sprawdzony przez właściciela 24.11.2026. Etapy 19.1–19.4 są zmianami w następnym PR.**
+Wdrożenie migracji V4 i V5 potwierdziły logi produkcyjne; właściciel zgłosił poprawne działanie po aktualizacji. Dokładność czasów i prawa do materiałów nadal wymagają osobnej weryfikacji.
 
 Szybka orientacja: [zakres MVP](#zakres-demonstracyjnego-mvp) ·
 [czego nie ma w MVP](#poza-zakresem-mvp) ·
@@ -63,7 +60,7 @@ paginacją; wyszukiwarka znajduje nagrania, utwory, poetów i artystów w
 katalogu pobranym z API. Dostępne materiały MP3, MP4 i YouTube można
 odtwarzać przez istniejące odtwarzacze.
 
-Przyciski **Ulubione** i **Edukacja** są widoczne, lecz nieaktywne.
+Etapy 19.1–19.2 aktywują **Ulubione** (`/ulubione`, komunikat MVP bez zapisu) i **Edukacja** (`/edukacja`, propozycje i wybór szkolny).
 Etap 19 dodaje stronę `/nagrania/{uuid}` z przełącznikiem napisów i przewijaniem tekstu. Starsze dane bez czasów wersów oferują wyraźnie oznaczone przybliżenie, a nie precyzyjne karaoke.
 
 ## Kierunek wizualny
@@ -138,7 +135,7 @@ Projekt jest rozwijany z myślą o lekkiej infrastrukturze serwerowej i kontrolo
 
 ## Status projektu
 
-**Wersja demonstracyjnego MVP została zamknięta po etapie 18. Etap 19 rozwija ją na podstawie pierwszego feedbacku; nie oznacza to automatycznie wdrożenia na QNAP.**
+**Demonstracyjne MVP zostało zamknięte po etapie 18. Etap 19 wdrożono na QNAP i właściciel zgłosił poprawne działanie. Rozszerzenie 19.1–19.4 pozostaje w PR do przetestowania i wdrożenia.**
 Zrealizowano implementację interfejsu, katalogu, odtwarzania i wyszukiwania.
 Etap 17 został sprawdzony na telefonie przez właściciela projektu;
 PR #18 został scalony, testy CI przeszły i obraz frontendu został
@@ -151,7 +148,7 @@ niezależnie potwierdzone**.
 | Obszar | Dostarczona funkcja |
 | --- | --- |
 | Ekran główny | Wiersz na dziś, Poeci, Artyści, Wybrane dla Ciebie |
-| Nawigacja | Działające Ekran główny, Biblioteka i Szukaj |
+| Nawigacja | Ekran główny, Biblioteka, Szukaj; 19.1–19.2: Ulubione (komunikat MVP) i Edukacja |
 | Katalog | Opublikowane nagrania, profile poetów i wykonawców, strony utworów |
 | Odtwarzanie | MP3 i MP4 z QNAP (HTTP Range), osadzanie YouTube z linkiem do źródła; etap 19: dopuszczone zewnętrzne MP3 z archive.org |
 | Odkrywanie | Poziome kafelki, przeglądanie biblioteki, wyszukiwanie po metadanych |
@@ -166,8 +163,8 @@ Wybór „Wybrane dla Ciebie” jest przeglądem katalogu, a nie systemem rekome
 
 - **W pełni dokładne napisy i karaoke dla całego katalogu** — etap 19 udostępnia interfejs i obsługę rzeczywistych znaczników czasu, ale starsze nagrania PoetryStream mają tylko kolejność wersów i przesunięcie startu. Wymagają ręcznej korekty/oznaczenia czasów oraz weryfikacji praw.
 - **Edycja i zatwierdzanie transkrypcji** — brak narzędzia redakcyjnego.
-- **Ulubione** — przycisk w nawigacji jest nieaktywny; brak zapisywania wyborów.
-- **Edukacja** — przycisk w nawigacji jest nieaktywny; nie ma modułu edukacyjnego.
+- **Zapisywanie ulubionych** — brak trwałego zapisywania; 19.1 dodaje aktywną stronę z komunikatem MVP.
+- **Rozbudowana edukacja** — 19.2 dodaje listy informacyjne i linki do katalogu; brak kont ucznia, śledzenia postępów i kompletnego wykazu lektur.
 - **Logowanie, synchronizacja danych między urządzeniami, automatyczne
   rekomendacje i rozbudowany panel zarządzania katalogiem** — nie wchodzą do MVP.
 
@@ -1027,7 +1024,7 @@ poems, recordings and video excerpts, and verify the public domain/route.
 
 ---
 
-## Etap 19 — feedback: katalog PoetryStream i strona nagrania z tekstem (implementacja w PR)
+## Etap 19 — feedback: katalog PoetryStream i strona nagrania z tekstem (wdrożony 24.11.2026)
 
 Zakres wdrożony w gałęzi `feature/poetrystream-synced-reading`:
 
@@ -1091,10 +1088,9 @@ brak transkrypcji i błędne/nieosiągalne źródło. Zweryfikować, że kafelki
 nie odtwarzają w miejscu. Dopiero po wdrożeniu i testach oznaczyć ten
 etap jako działający produkcyjnie.
 
-### Etap 20 (zaplanowany) — cztery wersje językowe
+### Etap 20 (zaplanowany) — polski i angielski interfejs
 
-- Pełny wybór języka: **polski (pl), angielski (en), hiszpański (es),
-  niemiecki (de)**, zapamiętywany lokalnie i łatwo przełączany na telefonie.
+- W pierwszej kolejności **polski (pl) i angielski (en)**, zapamiętywane lokalnie. Hiszpański i niemiecki pozostają opcją późniejszego rozwoju. Wybór języka napisów z etapu 19.4 jest niezależny od języka interfejsu.
 - Tłumaczenia **wszystkich elementów UI**: menu, komunikatów, etykiet
   playera, wyszukiwarki, opisów i komunikatów błędów.
 - Oddzielne wersje językowe tytułów, opisów, biogramów i tekstów wierszy;
@@ -1117,7 +1113,52 @@ etap jako działający produkcyjnie.
   i rozmiaru oraz prawa do publikacji.
 - Edytor wierszy z wersjonowaniem i synchronizacją:
   `start_ms/end_ms`, odsłuch kontrolny, tryb szkicu, weryfikacja i publikacja.
-- Obsługa wszystkich czterech języków, historia zmian, audyt działań,
+- Obsługa języków dostępnych w katalogu (początkowo PL/EN), historia zmian, audyt działań,
   podgląd przed publikacją i ochrona przed przypadkowym nadpisaniem.
 
 Etapy 20 i 21 są **w roadmapie, nie zaimplementowane**.
+
+
+---
+
+## Etapy 19.1–19.4 — drugi feedback (PR, przed wdrożeniem)
+
+- **19.1 Ulubione:** działający przycisk i osobna strona z informacją o wersji MVP; bez pozorowanego zapisywania.
+- **19.2 Edukacja:** Najmłodsi (bez granic wieku), I–III, IV–VI, VII–VIII, liceum/technikum i Warte poznania. Rozwijane listy odróżniają propozycje od wymagań podstawy z 2024 r.; nowe zasady MEN obowiązują stopniowo od września 2026 r. od klas I i IV. To wybór poezji, nie pełna lista obowiązkowa dla każdego rocznika. Link do nagrania pojawia się tylko przy zgodnym opublikowanym utworze i autorze z API.
+- **19.3 YouTube:** oficjalny widoczny IFrame Player API, odczyt czasu co 250 ms, obsługa pauzy i przewijania przez zegar odtwarzacza. Bez pobierania, wydzielania audio, ukrywania filmu czy dodatkowego obciążania QNAP transkodowaniem. W razie blokady API tekst można czytać ręcznie, a link do YouTube pozostaje dostępny.
+- **19.4 Napisy PL/EN:** flagi Polski i Wielkiej Brytanii, dostępne nazwy dla czytników ekranu, brakujący język nieaktywny. Wybór nie przeładowuje nagrania; UI pozostaje polskie. Własne audio, wideo i YouTube korzystają z tego samego mechanizmu.
+
+### Baza i API
+
+Migracja V6 zachowuje wszystkie dotychczasowe identyfikatory, teksty, segmenty,
+czasy i statusy, a zmienia relację na wiele ścieżek dla jednego nagrania.
+`transcript`: unikatowe `(media_item_id, language_code)`, `full_text`,
+`translator_name`, `verification_status`, `public_visible`, `start_offset_ms`.
+`transcript_segment`: kolejność wersów i niezależne `start_ms/end_ms` dla każdej ścieżki.
+Stary nieustalony język zachowujemy jako `und`; nie przypisujemy go fałszywie do flagi.
+Dotychczasowy `media_item.transcript_status` jest polem historycznym;
+status każdej ścieżki jest teraz źródłem prawdy. Istniejące ścieżki zachowują widoczność.
+Nowe ścieżki wprowadzane SQL domyślnie są prywatne (`public_visible=false`);
+status DRAFT nie jest zgodą na publikację, a VERIFIED nie zastępuje weryfikacji praw.
+
+- `GET /api/v1/media/{uuid}/transcripts` — lista publicznych ścieżek (pusta lista, gdy brak), 404 dla nieopublikowanego/nieznanego nagrania.
+- Dotychczasowy `GET /api/v1/media/{uuid}/transcript` pozostaje kompatybilny (PL, następnie EN, następnie inny dostępny język; 404 dla braku).
+- Brak publicznego zapisu i edytora. Docelowo panel administratora edytuje te rekordy i czasy.
+
+Przekład Eliota przez Mariana Polaka-Chlabicza (Tekstualia 2/2024) został
+dostarczony przez właściciela. Nie umieszczamy chronionego tekstu w publicznym
+repozytorium ani publicznym API przed potwierdzeniem uprawnień. Wprowadzić
+do bazy prywatnie jako PL, z nazwiskiem tłumacza, po wskazaniu właściwego
+UUID nagrania. Oryginał EN wymaga potwierdzenia źródła i praw. Czasy obu
+wersji wymagają odsłuchu; bez kompletnych czasów nie oznaczać jako VERIFIED.
+Brak nagrania audio może być uzupełniony później legalnie dostarczonym MP3.
+
+### Wdrożenie i odbiór
+
+Po zielonym CI, scaleniu i publikacji GHCR wykonać kopię PostgreSQL przed V6,
+pobrać backend i frontend oraz uruchomić oba, jak dla etapu 19.
+Sprawdzić migrację V6, zachowanie 254 wcześniejszych segmentów, endpoint
+`/transcripts`, oba przyciski na telefonie, odświeżenie podstron, edukacyjne
+odnośniki, oba języki na testowym nagraniu (zmiana bez utraty pozycji),
+blokadę prywatnej ścieżki, brak danych, pauzę i przewijanie YouTube/MP3/MP4.
+Nie zmieniać Compose, Nginx, Cloudflare ani plików medialnych.
