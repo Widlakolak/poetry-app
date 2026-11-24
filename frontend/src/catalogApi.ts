@@ -25,6 +25,7 @@ export type TranscriptRecord = {
   mediaId: string;
   languageCode: string | null;
   fullText: string | null;
+  translatorName?: string | null;
   status: "NOT_AVAILABLE" | "DRAFT" | "VERIFIED";
   startOffsetMs: number;
   segments: TranscriptSegment[];
@@ -71,6 +72,7 @@ function isTranscript(value: unknown): value is TranscriptRecord {
     && typeof value.mediaId === "string"
     && (value.languageCode === null || typeof value.languageCode === "string")
     && (value.fullText === null || typeof value.fullText === "string")
+    && (value.translatorName === undefined || value.translatorName === null || typeof value.translatorName === "string")
     && ["NOT_AVAILABLE", "DRAFT", "VERIFIED"].includes(String(value.status))
     && typeof value.startOffsetMs === "number" && Number.isSafeInteger(value.startOffsetMs)
     && value.startOffsetMs >= 0
@@ -217,4 +219,15 @@ export function creatorSlug(displayName: string): string {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
+}
+
+export async function fetchTranscripts(id: string, signal: AbortSignal): Promise<TranscriptRecord[]> {
+  const response = await fetch("/api/v1/media/" + encodeURIComponent(id) + "/transcripts", { signal });
+  if (response.status === 404) return [];
+  if (!response.ok) throw new Error("Transcript request failed: " + response.status);
+  const payload: unknown = await response.json();
+  if (!Array.isArray(payload) || !payload.every((track: unknown) => isTranscript(track) && track.mediaId === id)) {
+    throw new Error("Invalid transcript tracks response");
+  }
+  return payload;
 }
