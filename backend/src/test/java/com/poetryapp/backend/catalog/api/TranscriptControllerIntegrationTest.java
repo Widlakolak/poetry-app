@@ -55,9 +55,38 @@ class TranscriptControllerIntegrationTest {
     }
 
     @Test
+    void returnsIndependentLanguagesAndNeverExposesPrivateTracks() throws Exception {
+        MediaItem recording = media.saveAndFlush(recording());
+        recording.publish();
+        media.saveAndFlush(recording);
+        Transcript polish = new Transcript(recording, "pl", "Przekład", "Tłumacz testowy", TranscriptStatus.DRAFT, true);
+        polish.addSegment("Przekład", 1000L, 3500L);
+        Transcript english = new Transcript(recording, "en", "Original", null, TranscriptStatus.VERIFIED, true);
+        english.addSegment("Original", 1000L, 2500L);
+        Transcript privateTrack = new Transcript(recording, "de", "Private", null, TranscriptStatus.DRAFT, false);
+        transcripts.saveAllAndFlush(java.util.List.of(polish, english, privateTrack));
+        mvc.perform(get("/api/v1/media/{id}/transcripts", recording.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].languageCode").value("en"))
+                .andExpect(jsonPath("$[0].status").value("VERIFIED"))
+                .andExpect(jsonPath("$[0].segments[0].endMs").value(2500))
+                .andExpect(jsonPath("$[1].languageCode").value("pl"))
+                .andExpect(jsonPath("$[1].status").value("DRAFT"))
+                .andExpect(jsonPath("$[1].translatorName").value("Tłumacz testowy"))
+                .andExpect(jsonPath("$[1].segments[0].endMs").value(3500));
+        mvc.perform(get("/api/v1/media/{id}/transcript", recording.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.languageCode").value("pl"));
+    }
+
+    @Test
     void hidesDraftMediaAndAbsentTranscripts() throws Exception {
         MediaItem draft = media.saveAndFlush(recording());
         mvc.perform(get("/api/v1/media/{id}/transcript", draft.getId()))
+                .andExpect(status().isNotFound());
+
+        mvc.perform(get("/api/v1/media/{id}/transcripts", draft.getId()))
                 .andExpect(status().isNotFound());
 
         MediaItem published = media.saveAndFlush(recording());
@@ -65,6 +94,10 @@ class TranscriptControllerIntegrationTest {
         media.saveAndFlush(published);
         mvc.perform(get("/api/v1/media/{id}/transcript", published.getId()))
                 .andExpect(status().isNotFound());
+
+        mvc.perform(get("/api/v1/media/{id}/transcripts", published.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(0));
 
         mvc.perform(get("/api/v1/media/{id}/transcript", UUID.randomUUID()))
                 .andExpect(status().isNotFound());
