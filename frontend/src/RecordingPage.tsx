@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, BookOpen, Captions, CaptionsOff, Music2 } from "lucide-react";
-import { fetchMediaById, fetchTranscript, fetchWorks, type MediaRecord, type TranscriptRecord, type WorkRecord } from "./catalogApi";
+import { fetchMediaById, fetchTranscripts, fetchWorks, type MediaRecord, type TranscriptRecord, type WorkRecord } from "./catalogApi";
 import { playbackSource } from "./playbackSource";
-import YouTubeEmbed from "./YouTubeEmbed";
+import TimedYouTubeEmbed from "./TimedYouTubeEmbed";
 
 type LoadedRecording = {
   media: MediaRecord;
-  transcript: TranscriptRecord | null;
+  transcripts: TranscriptRecord[];
   works: WorkRecord[];
 };
 
@@ -16,7 +16,7 @@ function activeLineAt(
   durationMs: number,
 ): number {
   const segments = transcript.segments;
-  if (segments.length === 0) return -1;
+  if (segments.length === 0 || durationMs <= 0) return -1;
 
   const preciselyTimed = segments.every((segment) =>
     segment.startMs !== null && segment.endMs !== null);
@@ -67,17 +67,20 @@ function SynchronizedText({
       top: Math.max(0, center),
       behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
     });
-  }, [activeLine]);
+  }, [activeLine, transcript]);
 
   const lines = transcript.segments.length > 0
     ? transcript.segments.map((segment) => segment.text)
     : (transcript.fullText ?? "").split(/\r?\n/).filter(Boolean);
 
   return (
-    <section className="transcript-section" aria-label="Tekst nagrania">
-      <h2>Tekst wiersza</h2>
+    <section className="transcript-section" aria-label="Tekst nagrania" lang={transcript.languageCode ?? undefined}>
+      <h2>{transcript.languageCode === "en" ? "Poem text" : "Tekst wiersza"}</h2>
+      {transcript.translatorName ? <p className="transcript-note">Tłum. {transcript.translatorName}</p> : null}
       <p className="transcript-note">
-        {isPreciselyTimed
+        {durationMs <= 0 || transcript.segments.length === 0
+          ? "Tekst do czytania — synchronizacja nie jest obecnie dostępna."
+          : isPreciselyTimed
           ? (transcript.status === "VERIFIED"
               ? "Zweryfikowane znaczniki czasu"
               : "Znaczniki czasu — transkrypcja robocza")
@@ -104,6 +107,8 @@ export default function RecordingPage({ id }: { id: string }) {
   const [status, setStatus] = useState<"loading" | "ready" | "not-found" | "error">("loading");
   const [retry, setRetry] = useState(0);
   const [showCaptions, setShowCaptions] = useState(true);
+  const [language, setLanguage] = useState<"pl" | "en">("pl");
+  const [captionError, setCaptionError] = useState(false);
   const [currentMs, setCurrentMs] = useState(0);
   const [durationMs, setDurationMs] = useState(0);
   const [playError, setPlayError] = useState(false);
@@ -113,18 +118,23 @@ export default function RecordingPage({ id }: { id: string }) {
     setStatus("loading");
     setLoaded(null);
     setPlayError(false);
+    setCaptionError(false);
     setCurrentMs(0);
     setDurationMs(0);
 
     void Promise.all([
       fetchMediaById(id, controller.signal),
-      fetchTranscript(id, controller.signal),
+      fetchTranscripts(id, controller.signal).catch(() => {
+        if (!controller.signal.aborted) setCaptionError(true);
+        return [] as TranscriptRecord[];
+      }),
       fetchWorks(controller.signal).catch(() => [] as WorkRecord[]),
-    ]).then(([media, transcript, works]) => {
+    ]).then(([media, transcripts, works]) => {
       if (controller.signal.aborted) return;
       if (!media) { setStatus("not-found"); return; }
-      setLoaded({ media, transcript, works: works.filter((work) =>
+      setLoaded({ media, transcripts, works: works.filter((work) =>
         work.recordings.some((recording) => recording.id === id)) });
+      setLanguage(transcripts.some((t) => t.languageCode === "pl") ? "pl" : "en");
       setStatus("ready");
     }).catch(() => {
       if (!controller.signal.aborted) setStatus("error");
@@ -144,9 +154,12 @@ export default function RecordingPage({ id }: { id: string }) {
   }
 
   const source = playbackSource(loaded.media);
-  const captionsAvailable = loaded.transcript !== null
-    && Boolean(loaded.transcript.fullText || loaded.transcript.segments.length)
-    && source !== null && source.kind !== "youtube";
+  const tracks = loaded.transcripts.filter((track) => track.status !== "NOT_AVAILABLE"
+    && Boolean(track.fullText || track.segments.length));
+  const selectedTranscript = tracks.find((track) => track.languageCode === language)
+    ?? tracks.find((track) => track.languageCode !== "pl" && track.languageCode !== "en");
+  const captionsAvailable = selectedTranscript !== undefined;
+  const hasLanguage = (code: string) => tracks.some((track) => track.languageCode === code);
 
   const mediaControls = source?.kind === "audio" ? (
     <audio
@@ -186,7 +199,7 @@ export default function RecordingPage({ id }: { id: string }) {
       Twoja przeglądarka nie obsługuje nagrań wideo.
     </video>
   ) : source?.kind === "youtube" ? (
-    <YouTubeEmbed videoId={source.videoId} title={loaded.media.title} />
+    <TimedYouTubeEmbed videoId={source.videoId} title={loaded.media.title} onTime={setCurrentMs} onDuration={setDurationMs} />
   ) : (
     <p className="library-unavailable">To nagranie nie ma obsługiwanego źródła.</p>
   );
@@ -212,21 +225,47 @@ export default function RecordingPage({ id }: { id: string }) {
           <button
             className="library-action"
             type="button"
-            disabled={!captionsAvailable}
+            disabled={tracks.length === 0}
             onClick={() => setShowCaptions((value) => !value)}
-            aria-pressed={captionsAvailable && showCaptions}
+            aria-pressed={tracks.length > 0 && showCaptions}
           >
             {showCaptions ? <CaptionsOff size={17} aria-hidden="true" /> : <Captions size={17} aria-hidden="true" />}
             {showCaptions ? "Wyłącz napisy" : "Włącz napisy"}
           </button>
         </div>
         <div className="recording-player-media">{mediaControls}</div>
+        <div className="caption-language-picker" role="group" aria-label="Język napisów">
+          {(["pl", "en"] as const).map((code) => {
+            const available = hasLanguage(code);
+            const label = code === "pl" ? "Polski" : "English";
+            return <button key={code} className="caption-flag" type="button" disabled={!available}
+              title={label + (available ? "" : " — napisy niedostępne")}
+              aria-label={label + (available ? "" : " — napisy niedostępne")}
+              aria-pressed={available && language === code} onClick={() => setLanguage(code)}>
+              <LanguageFlag language={code} />
+            </button>;
+          })}
+        </div>
         {playError ? <p className="library-error" role="alert">Nie udało się odtworzyć źródła nagrania.</p> : null}
-        {!captionsAvailable ? <p className="transcript-note">Dla tego nagrania nie ma jeszcze napisów zsynchronizowanych z odtwarzaczem.</p> : null}
+        {captionError ? <p className="transcript-note" role="alert">Nie udało się wczytać napisów. <button className="library-action" onClick={() => setRetry((value) => value + 1)}>Spróbuj ponownie</button></p>
+          : !captionsAvailable ? <p className="transcript-note">Dla tego nagrania nie ma jeszcze dostępnych napisów.</p> : null}
       </section>
-      {captionsAvailable && showCaptions && loaded.transcript ? (
-        <SynchronizedText transcript={loaded.transcript} currentMs={currentMs} durationMs={durationMs} />
+      {captionsAvailable && showCaptions && selectedTranscript ? (
+        <SynchronizedText key={selectedTranscript.languageCode ?? "und"} transcript={selectedTranscript} currentMs={currentMs} durationMs={durationMs} />
       ) : null}
     </main>
   );
+}
+
+// SVG flags render consistently even on Windows, where flag emoji may be letters.
+function LanguageFlag({ language }: { language: "pl" | "en" }) {
+  return language === "pl" ? <svg viewBox="0 0 60 36" aria-hidden="true" focusable="false">
+    <rect width="60" height="18" fill="#fff" /><rect y="18" width="60" height="18" fill="#dc143c" />
+  </svg> : <svg viewBox="0 0 60 36" aria-hidden="true" focusable="false">
+    <rect width="60" height="36" fill="#012169" />
+    <path d="M0 0L60 36M60 0L0 36" stroke="#fff" strokeWidth="7" />
+    <path d="M0 0L60 36M60 0L0 36" stroke="#c8102e" strokeWidth="3" />
+    <path d="M30 0V36M0 18H60" stroke="#fff" strokeWidth="12" />
+    <path d="M30 0V36M0 18H60" stroke="#c8102e" strokeWidth="7" />
+  </svg>;
 }

@@ -1626,3 +1626,24 @@ code {
 @media (prefers-reduced-motion: reduce) {
   .catalog-media-card-link { transition: none; }
 }
+
+
+/* Stage 19 follow-up: compact education accordions and language flags. */
+.education-stage summary { display:flex; align-items:center; gap:12px; cursor:pointer; list-style:none; min-height:44px; }
+.education-stage summary::-webkit-details-marker { display:none; }
+.education-stage summary::after { content:"+"; margin-left:auto; font-size:23px; color:var(--olive-dark); }
+.education-stage[open] summary::after { content:"−"; }
+.education-stage summary span { flex:1; min-width:0; }
+.education-stage small { display:block; color:var(--muted); margin-top:4px; }
+.education-stage h3 { font-size:15px; margin:20px 0 9px; }
+.education-list { list-style:none; padding:0; margin:0; }
+.education-list li { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:11px 0; border-top:1px solid var(--line); }
+.education-list li span { min-width:0; overflow-wrap:anywhere; }
+.education-list a { flex-shrink:0; color:var(--olive-dark); font-size:13px; text-underline-offset:3px; }
+.caption-language-picker { display:flex; gap:9px; margin:14px 0; align-items:center; }
+.caption-flag { display:grid; place-items:center; padding:7px; border:1px solid var(--line); border-radius:9px; background:var(--white); min-width:48px; min-height:44px; cursor:pointer; }
+.caption-flag svg { display:block; width:30px; height:20px; border-radius:2px; }
+.caption-flag[aria-pressed="true"] { outline:2px solid var(--olive-dark); outline-offset:1px; }
+.caption-flag:disabled { opacity:.35; cursor:not-allowed; }
+.caption-flag:focus-visible, .education-stage summary:focus-visible { outline:3px solid var(--olive-dark); outline-offset:3px; }
+.timed-youtube-frame iframe { min-height:200px; }

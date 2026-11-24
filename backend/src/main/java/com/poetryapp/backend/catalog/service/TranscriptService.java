@@ -1,6 +1,8 @@
 package com.poetryapp.backend.catalog.service;
 
 import java.util.UUID;
+import java.util.List;
+import java.util.Comparator;
 import com.poetryapp.backend.catalog.api.TranscriptResponse;
 import com.poetryapp.backend.catalog.domain.PublicationStatus;
 import com.poetryapp.backend.catalog.repository.MediaItemRepository;
@@ -22,11 +24,15 @@ public class TranscriptService {
     }
 
     public TranscriptResponse forPublishedMedia(UUID mediaId) {
-        // Never reveal draft or private media through transcript lookup.
+        return allForPublishedMedia(mediaId).stream()
+                .min(Comparator.comparingInt(track -> "pl".equals(track.languageCode()) ? 0 : "en".equals(track.languageCode()) ? 1 : 2))
+                .orElseThrow(() -> new ResourceNotFoundException("Transcript not found"));
+    }
+
+    public List<TranscriptResponse> allForPublishedMedia(UUID mediaId) {
         media.findByIdAndPublicationStatus(mediaId, PublicationStatus.PUBLISHED)
                 .orElseThrow(() -> new ResourceNotFoundException("Transcript not found"));
-        return transcripts.findByMediaItem_Id(mediaId)
-                .map(TranscriptResponse::from)
-                .orElseThrow(() -> new ResourceNotFoundException("Transcript not found"));
+        return transcripts.findByMediaItem_IdAndPublicVisibleTrueOrderByLanguageCodeAsc(mediaId)
+                .stream().map(TranscriptResponse::from).toList();
     }
 }

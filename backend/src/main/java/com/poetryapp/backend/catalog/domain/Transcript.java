@@ -14,25 +14,38 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "transcript")
+@Table(name = "transcript", uniqueConstraints = @UniqueConstraint(name = "uk_transcript_media_language", columnNames = {"media_item_id", "language_code"}))
 public class Transcript {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "media_item_id", nullable = false, unique = true)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "media_item_id", nullable = false)
     private MediaItem mediaItem;
 
-    @Column(name = "language_code", length = 12)
+    @Column(name = "language_code", nullable = false, length = 12)
     private String languageCode;
+
+    @Column(name = "translator_name", length = 200)
+    private String translatorName;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "verification_status", nullable = false, length = 20)
+    private TranscriptStatus verificationStatus;
+
+    @Column(name = "public_visible", nullable = false)
+    private boolean publicVisible;
 
     @Column(name = "full_text", columnDefinition = "text")
     private String fullText;
@@ -53,13 +66,23 @@ public class Transcript {
     }
 
     public Transcript(MediaItem mediaItem, String languageCode, String fullText) {
+        this(mediaItem, languageCode, fullText, null, mediaItem.getTranscriptStatus(), true);
+    }
+
+    public Transcript(MediaItem mediaItem, String languageCode, String fullText,
+            String translatorName, TranscriptStatus verificationStatus, boolean publicVisible) {
         this.mediaItem = mediaItem;
-        this.languageCode = languageCode;
+        this.languageCode = languageCode == null || languageCode.isBlank() ? "und" : languageCode.trim().toLowerCase(java.util.Locale.ROOT);
         this.fullText = fullText;
+        this.translatorName = translatorName;
+        this.verificationStatus = verificationStatus;
+        this.publicVisible = publicVisible;
     }
 
     public MediaItem getMediaItem() { return mediaItem; }
     public String getLanguageCode() { return languageCode; }
+    public String getTranslatorName() { return translatorName; }
+    public TranscriptStatus getVerificationStatus() { return verificationStatus; }
     public String getFullText() { return fullText; }
     public long getStartOffsetMs() { return startOffsetMs; }
     public List<TranscriptSegment> getSegments() { return segments; }

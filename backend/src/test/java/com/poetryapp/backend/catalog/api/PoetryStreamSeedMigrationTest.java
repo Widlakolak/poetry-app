@@ -25,7 +25,7 @@ class PoetryStreamSeedMigrationTest {
              Statement stmt = connection.createStatement()) {
             assertEquals(6, count(stmt, "SELECT count(*) FROM literary_work WHERE is_published = TRUE"));
             assertEquals(5, count(stmt, "SELECT count(*) FROM media_item WHERE source_type = 'EXTERNAL_AUDIO' AND publication_status = 'PUBLISHED'"));
-            assertEquals(5, count(stmt, "SELECT count(*) FROM transcript WHERE language_code = 'pl'"));
+            assertEquals(5, count(stmt, "SELECT count(*) FROM transcript WHERE language_code = 'pl' AND public_visible = TRUE AND verification_status = 'DRAFT'"));
             assertEquals(254, count(stmt, "SELECT count(*) FROM transcript_segment WHERE start_ms IS NULL AND end_ms IS NULL"));
             assertEquals(5, count(stmt, "SELECT count(*) FROM work_recording"));
             assertEquals(10, count(stmt, "SELECT count(*) FROM media_credit"));
