@@ -70,7 +70,11 @@ export default function RecommendationsRail() {
         return {
           key: item.id,
           content: (
-            <article className="catalog-media-card">
+            <a
+              className="catalog-media-card catalog-media-card-link"
+              href={"/nagrania/" + encodeURIComponent(item.id)}
+              aria-label={"Otwórz nagranie i napisy: " + item.title}
+            >
               <div className="catalog-media-cover" aria-hidden="true">
                 {isAudio ? <Music2 size={32} strokeWidth={1.3} /> :
                   <Film size={32} strokeWidth={1.3} />}
@@ -78,15 +82,11 @@ export default function RecommendationsRail() {
               </div>
               <div className="catalog-media-body">
                 <h3>{item.title}</h3>
-                <a
-                  className="library-action catalog-media-play"
-                  href={"/nagrania/" + encodeURIComponent(item.id)}
-                  aria-label={"Otwórz nagranie i napisy: " + item.title}
-                >
+                <span className="library-action catalog-media-play">
                   <ArrowUpRight size={16} aria-hidden="true" /> Otwórz nagranie
-                </a>
+                </span>
               </div>
-            </article>
+            </a>
           ),
         };
       })}
