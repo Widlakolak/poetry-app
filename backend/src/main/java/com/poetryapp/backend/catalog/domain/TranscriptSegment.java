@@ -44,6 +44,11 @@ public class TranscriptSegment {
     protected TranscriptSegment() {
     }
 
+    public int getSequenceNumber() { return sequenceNumber; }
+    public String getText() { return text; }
+    public Long getStartMs() { return startMs; }
+    public Long getEndMs() { return endMs; }
+
     public TranscriptSegment(
             Transcript transcript,
             int sequenceNumber,

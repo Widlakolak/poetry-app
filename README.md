@@ -1,7 +1,7 @@
 # Poetry App
 ### Cyfrowa przestrzeń do słuchania, czytania i odkrywania poezji
 
-**Status: demonstracyjne MVP zaimplementowane w repozytorium (etapy do 18).**
+**Status: demonstracyjne MVP (etapy do 18) oraz rozszerzenie po pierwszym feedbacku (etap 19 w osobnej gałęzi/PR).**
 Kod wyszukiwarki z etapu 18 został scalony do `main`, a CI i publikacja
 obrazów Docker w GHCR zakończyły się powodzeniem. **Nie oznacza to jeszcze
 potwierdzenia wdrożenia najnowszego frontendu na QNAP ani zakończenia testów
@@ -16,7 +16,7 @@ Szybka orientacja: [zakres MVP](#zakres-demonstracyjnego-mvp) ·
 
 Poetry App to projekt aplikacji cyfrowej, której celem jest przybliżanie poezji współczesnym odbiorcom poprzez nagrania aktorskie, materiały wideo i teksty literackie.
 
-Demonstracyjne MVP łączy nagrania audio i wideo z katalogiem twórców oraz utworów. Użytkownik może słuchać i oglądać opublikowane materiały, przeszukiwać katalog i otwierać powiązane profile. Wyświetlanie pełnych tekstów wierszy i synchronizacja z nagraniami należą do dalszego planu rozwoju.
+Demonstracyjne MVP łączy nagrania audio i wideo z katalogiem twórców oraz utworów. Użytkownik może słuchać i oglądać opublikowane materiały, przeszukiwać katalog i otwierać powiązane profile. Etap 19 wprowadza osobną stronę nagrania z opcjonalnym tekstem wiersza i przewijaniem zależnym od pozycji odtwarzacza. Dokładna synchronizacja wymaga zweryfikowanych znaczników czasu; teksty demonstracyjne PoetryStream mają tylko kolejność wersów.
 
 Istotnym założeniem jest stworzenie spokojnego środowiska odbioru literatury. Aplikacja nie ma konkurować z użytkownikiem o uwagę za pomocą nadmiaru bodźców wizualnych. Jej interfejs ma sprzyjać skupieniu na słowie, głosie i interpretacji.
 
@@ -30,7 +30,7 @@ Projekt ma służyć zarówno osobom, które już interesują się literaturą, 
 
 - **Poezja dostępna na co dzień** - możliwość słuchania i czytania utworów w wygodnej formie cyfrowej.
 - **Interpretacja aktorska** - wykorzystanie głosu, emocji i indywidualnego sposobu odczytania tekstu jako integralnej części doświadczenia literackiego.
-- **Połączenie dźwięku i słowa (dalszy etap)** - prezentowanie tekstu wiersza podczas odtwarzania nagrania; funkcja nie jest częścią obecnego MVP.
+- **Połączenie dźwięku i słowa (etap 19)** - tekst na stronie nagrania, włączane/wyłączane napisy oraz przewijanie wersów; dokładność zależy od dostępności i weryfikacji znaczników czasu.
 - **Odkrywanie twórców** - stworzenie przestrzeni do poznawania poetów, aktorów i ich interpretacji.
 - **Spokojny interfejs** - ograniczenie zbędnych elementów wizualnych, intensywnych kolorów i rozpraszających mechanizmów.
 - **Dostępność cyfrowa** - rozwijanie aplikacji z myślą o wygodzie korzystania na telefonach i innych urządzeniach.
@@ -55,7 +55,7 @@ Ekran główny zachowuje ustaloną kolejność sekcji:
 - **Wiersz na dziś** — duża karta z wyróżnionym filmem MP4 i odtwarzaniem na miejscu (obecnie wybrany materiał z katalogu, bez automatycznej codziennej rotacji);
 - **Poeci** — poziomo przewijane kafelki prowadzące do profili i utworów;
 - **Artyści** — poziomo przewijane kafelki prowadzące do profili wykonawców i przypisanych im nagrań;
-- **Wybrane dla Ciebie** — poziomy przegląd najnowszych opublikowanych materiałów z możliwością odtwarzania, **bez personalizacji algorytmicznej**.
+- **Wybrane dla Ciebie** — poziomy przegląd najnowszych opublikowanych materiałów; kafelki **otwierają osobną stronę nagrania**, bez odtwarzania wewnątrz kafelka i bez personalizacji algorytmicznej (etap 19).
 
 Dolna nawigacja otwiera **Ekran główny**, **Bibliotekę** (`/biblioteka`)
 i **Szukaj** (`/szukaj`). Biblioteka przegląda opublikowane nagrania z
@@ -64,7 +64,7 @@ katalogu pobranym z API. Dostępne materiały MP3, MP4 i YouTube można
 odtwarzać przez istniejące odtwarzacze.
 
 Przyciski **Ulubione** i **Edukacja** są widoczne, lecz nieaktywne.
-Synchronizacja tekstu z nagraniem i tryb karaoke pozostają planem rozwoju.
+Etap 19 dodaje stronę `/nagrania/{uuid}` z przełącznikiem napisów i przewijaniem tekstu. Starsze dane bez czasów wersów oferują wyraźnie oznaczone przybliżenie, a nie precyzyjne karaoke.
 
 ## Kierunek wizualny
 
@@ -84,7 +84,7 @@ Inspiracja dotyczy filozofii projektowania i charakteru interfejsu, a nie kopiow
 - biblioteka i wyszukiwanie;
 - przygotowanie architektury do przechowywania metadanych i tekstów.
 
-### Etap 2 - Tekst towarzyszący nagraniu (plan; model danych przygotowany)
+### Etap 2 - Tekst towarzyszący nagraniu (częściowo dostarczony w etapie 19)
 
 - prezentowanie tekstu podczas odtwarzania;
 - synchronizacja fragmentów tekstu z nagraniem;
@@ -98,7 +98,7 @@ Inspiracja dotyczy filozofii projektowania i charakteru interfejsu, a nie kopiow
 - przygotowanie możliwości wykorzystania aplikacji podczas zajęć edukacyjnych;
 - poszukiwanie partnerstw z twórcami i instytucjami kultury.
 
-### Etap 4 - Napisy zsynchronizowane z odtwarzaniem (plan)
+### Etap 4 - Napisy zsynchronizowane z odtwarzaniem (mechanizm w etapie 19, dokładne oznaczanie czasu nadal do wykonania)
 
 - wyświetlanie zatwierdzonego tekstu wiersza lub transkrypcji jako napisów podczas odtwarzania MP3 i MP4;
 - powiązanie fragmentów tekstu ze znacznikami czasu, aby aktualny wers lub wypowiedź pojawiała się dokładnie w odpowiednim momencie;
@@ -107,7 +107,7 @@ Inspiracja dotyczy filozofii projektowania i charakteru interfejsu, a nie kopiow
 - przygotowanie lub korekta transkrypcji i czasów przed publikacją; ewentualna automatyczna transkrypcja może wspomagać przygotowanie materiału, ale nie jest wymagana podczas każdego odtworzenia;
 - udostępnianie napisów tylko wtedy, gdy istnieje zweryfikowany tekst i odpowiednie prawa do jego publikacji.
 
-Napisy „w czasie rzeczywistym” oznaczają tutaj synchronizację z bieżącym czasem odtwarzania, a nie kosztowne rozpoznawanie mowy na żywo przy każdym odsłuchaniu. Etap będzie realizowany po zatwierdzeniu zakresu i przygotowaniu wiarygodnych tekstów nagrań.
+Napisy „w czasie rzeczywistym” oznaczają synchronizację z bieżącym czasem odtwarzania, a nie rozpoznawanie mowy na żywo. Dla pełnej precyzji wymagane są zweryfikowane czasy początku i końca każdego wersu. Etap 19 wyświetla wersy demonstracyjne bez tych czasów tylko orientacyjnie, z jawną informacją dla odbiorcy.
 
 Kolejne etapy będą zależały od rezultatów prac nad pierwszą wersją, potrzeb odbiorców oraz dostępnych zasobów.
 
@@ -138,7 +138,7 @@ Projekt jest rozwijany z myślą o lekkiej infrastrukturze serwerowej i kontrolo
 
 ## Status projektu
 
-**Funkcjonalny zakres demonstracyjnego MVP jest zamknięty po etapie 18.**
+**Wersja demonstracyjnego MVP została zamknięta po etapie 18. Etap 19 rozwija ją na podstawie pierwszego feedbacku; nie oznacza to automatycznie wdrożenia na QNAP.**
 Zrealizowano implementację interfejsu, katalogu, odtwarzania i wyszukiwania.
 Etap 17 został sprawdzony na telefonie przez właściciela projektu;
 PR #18 został scalony, testy CI przeszły i obraz frontendu został
@@ -153,7 +153,7 @@ niezależnie potwierdzone**.
 | Ekran główny | Wiersz na dziś, Poeci, Artyści, Wybrane dla Ciebie |
 | Nawigacja | Działające Ekran główny, Biblioteka i Szukaj |
 | Katalog | Opublikowane nagrania, profile poetów i wykonawców, strony utworów |
-| Odtwarzanie | MP3 i MP4 z QNAP (HTTP Range), osadzanie YouTube z linkiem do źródła |
+| Odtwarzanie | MP3 i MP4 z QNAP (HTTP Range), osadzanie YouTube z linkiem do źródła; etap 19: dopuszczone zewnętrzne MP3 z archive.org |
 | Odkrywanie | Poziome kafelki, przeglądanie biblioteki, wyszukiwanie po metadanych |
 | Dane | Read-only API i PostgreSQL; identyfikatory i przypisania z katalogu |
 | Dostępność | Responsywny layout, kontrolki nawigacji klawiaturą i stany błędów |
@@ -164,9 +164,7 @@ Wybór „Wybrane dla Ciebie” jest przeglądem katalogu, a nie systemem rekome
 
 ### Poza zakresem MVP
 
-- **Teksty wierszy podczas odtwarzania, napisy zsynchronizowane i karaoke** —
-  brak działającego interfejsu; przygotowane tabele transkrypcji nie oznaczają
-  gotowej funkcji.
+- **W pełni dokładne napisy i karaoke dla całego katalogu** — etap 19 udostępnia interfejs i obsługę rzeczywistych znaczników czasu, ale starsze nagrania PoetryStream mają tylko kolejność wersów i przesunięcie startu. Wymagają ręcznej korekty/oznaczenia czasów oraz weryfikacji praw.
 - **Edycja i zatwierdzanie transkrypcji** — brak narzędzia redakcyjnego.
 - **Ulubione** — przycisk w nawigacji jest nieaktywny; brak zapisywania wyborów.
 - **Edukacja** — przycisk w nawigacji jest nieaktywny; nie ma modułu edukacyjnego.
@@ -1025,3 +1023,101 @@ docker compose --env-file .env -f compose.yaml ps
 Search is a navigation feature, not proof of public-distribution rights.
 Before an external demo, confirm permissions for any publicly accessible
 poems, recordings and video excerpts, and verify the public domain/route.
+
+
+---
+
+## Etap 19 — feedback: katalog PoetryStream i strona nagrania z tekstem (implementacja w PR)
+
+Zakres wdrożony w gałęzi `feature/poetrystream-synced-reading`:
+
+1. **Import demonstracyjnego katalogu PoetryStream** z wersjonowanego pliku
+   `poetry-stream/backend/src/main/resources/db/migration/V2__demo_data.sql`.
+   Migracja `V5__import_poetrystream_demo_catalog.sql` uruchamia się **tylko
+   w profilu `prod`**. Dodaje 6 utworów i powiązanych poetów; 5 utworów ma
+   nagrania MP3 na archive.org, transkrypcje z 254 wersami, wykonawców
+   i relacje utwór–nagranie. Szósty utwór (T. S. Eliot) jest bez nagrania,
+   ponieważ w demonstracyjnych danych źródła znajduje się nieprawidłowy
+   identyfikator YouTube. **To import danych z repozytorium, a nie odczyt
+   bieżącej produkcyjnej bazy PoetryStream.** Biografie zastępcze i losowe
+   zdjęcia z PoetryStream nie są importowane.
+2. **Odtwarzanie źródeł**: `EXTERNAL_AUDIO` dopuszcza wyłącznie
+   zweryfikowaną składniowo lokalizację HTTPS w domenie `archive.org`
+   (lub jej subdomenie) wskazującą na MP3. Strumień idzie bezpośrednio
+   z archive.org; nic nie jest kopiowane do QNAP ani bazy. Istniejące
+   nagrania lokalne i YouTube działają jak dotychczas. Dostępność,
+   ciągłość linków i prawo do publicznego udostępniania trzeba osobno
+   sprawdzić przed pokazem.
+3. **API tekstów**: `GET /api/v1/media/{uuid}/transcript` zwraca
+   język, status weryfikacji, tekst, `startOffsetMs`, posortowane wersy
+   oraz opcjonalne `startMs` / `endMs`. Endpoint nie udostępnia tekstów
+   nieopublikowanych nagrań; brak transkrypcji zwraca 404.
+4. **Strona nagrania**: `/nagrania/{uuid}` obsługuje MP3, MP4 i
+   zatwierdzony format URL YouTube, przełącznik „Włącz/Wyłącz napisy”,
+   przewijany tekst z podświetleniem aktualnego wersu i synchronizację
+   z pauzą oraz przewijaniem nagrania. Dla kompletnego zbioru znaczników
+   `startMs/endMs` dopasowanie odbywa się do czasu odtwarzania.
+   Dla starych danych z PoetryStream wiersze nie mają czasów i są
+   przybliżane proporcjonalnie do czasu odtwarzania od `startOffsetMs`.
+   UI zawsze oznacza taki wynik „**synchronizacją orientacyjną**”.
+   Kiedy przeglądarka nie podaje długości nagrania, nie udajemy synchronizacji.
+   YouTube iframe nie wystawia tu bieżącego czasu — brak obietnicy napisów
+   zsynchronizowanych dla takich nagrań.
+5. **„Wybrane dla Ciebie”**: kafelki nie zawierają już odtwarzacza.
+   Każdy otwiera stronę nagrania. Pozostałe ścieżki Biblioteki i Szukaj
+   zachowują odtwarzanie, a dodatkowo prowadzą do nowej podstrony.
+   Profil utworu odsyła bezpośrednio do odtwarzania z napisami.
+
+**Działania redakcyjne przed zaakceptowaniem dokładnej synchronizacji:**
+sprawdzić pełne teksty i prawa, odsłuchać każde z pięciu źródeł,
+uzupełnić zweryfikowane czasy `start_ms` i `end_ms` dla wszystkich wersów
+oraz po weryfikacji oznaczyć transkrypcję `VERIFIED`.
+Nie stosować automatycznego statusu `VERIFIED` dla orientacyjnego importu.
+
+**Wdrożenie po zielonym CI, review i scaleniu PR:**
+
+```sh
+# Najpierw kopia zapasowa PostgreSQL; migracja V5 zapisuje rekordy.
+cd /share/CACHEDEV1_DATA/Container/poetryapp || exit 1
+docker compose --env-file .env -f compose.yaml pull poetryapp-backend poetryapp-frontend
+docker compose --env-file .env -f compose.yaml up -d --no-deps poetryapp-backend poetryapp-frontend
+docker compose --env-file .env -f compose.yaml ps
+curl -fsS https://workdone.qzz.io/api/v1/works?size=20
+```
+
+Sprawdzić `/nagrania/{uuid}` dla lokalnego MP3, MP4, zewnętrznego MP3 i
+YouTube, przełącznik napisów, zmianę pozycji, pauzę, ekran telefonu,
+brak transkrypcji i błędne/nieosiągalne źródło. Zweryfikować, że kafelki
+nie odtwarzają w miejscu. Dopiero po wdrożeniu i testach oznaczyć ten
+etap jako działający produkcyjnie.
+
+### Etap 20 (zaplanowany) — cztery wersje językowe
+
+- Pełny wybór języka: **polski (pl), angielski (en), hiszpański (es),
+  niemiecki (de)**, zapamiętywany lokalnie i łatwo przełączany na telefonie.
+- Tłumaczenia **wszystkich elementów UI**: menu, komunikatów, etykiet
+  playera, wyszukiwarki, opisów i komunikatów błędów.
+- Oddzielne wersje językowe tytułów, opisów, biogramów i tekstów wierszy;
+  dla brakującego tłumaczenia jawny fallback, bez podszywania się pod
+  istniejącą wersję.
+- Niezależne ścieżki napisów i czasów dla każdego dostępnego języka,
+  jeśli tłumaczenie oraz prawa publikacji zostały zweryfikowane.
+- Dostępność (lang/ARIA), testy przełączania języków, SEO i
+  zapamiętywania wyboru.
+
+### Etap 21 (zaplanowany) — panel administracyjny
+
+- Bezpieczne logowanie i autoryzacja (administrator/redaktor);
+  publiczne API pozostaje tylko do odczytu.
+- Edycja poetów, artystów, biogramów, utworów, nazw wyświetlanych
+  i metadanych nagrań; możliwość poprawiania nazw plików **w katalogu**
+  bez niebezpiecznej zmiany ścieżek/przenoszenia fizycznych plików.
+- Dodawanie i kadrowanie grafik poetów, okładek wierszy i mediów;
+  pliki w trwałym storage poza kontenerami i bazą, walidacja formatów
+  i rozmiaru oraz prawa do publikacji.
+- Edytor wierszy z wersjonowaniem i synchronizacją:
+  `start_ms/end_ms`, odsłuch kontrolny, tryb szkicu, weryfikacja i publikacja.
+- Obsługa wszystkich czterech języków, historia zmian, audyt działań,
+  podgląd przed publikacją i ochrona przed przypadkowym nadpisaniem.
+
+Etapy 20 i 21 są **w roadmapie, nie zaimplementowane**.

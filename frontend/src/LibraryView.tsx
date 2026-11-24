@@ -3,6 +3,7 @@ import { Film, LibraryBig, Music2, Play, X } from "lucide-react";
 import { fetchWorks, type WorkRecord } from "./catalogApi";
 import { youtubeVideoId } from "./youtubeSource";
 import YouTubeEmbed from "./YouTubeEmbed";
+import { trustedArchiveAudioUrl } from "./playbackSource";
 
 type MediaItem = {
   id: string;
@@ -51,6 +52,9 @@ function isMediaPage(value: unknown): value is MediaPage {
 function playbackKind(item: MediaItem): "video" | "audio" | "youtube" | null {
   if (item.sourceType === "YOUTUBE") {
     return item.mediaType === "VIDEO" && youtubeVideoId(item.sourceUrl) ? "youtube" : null;
+  }
+  if (item.sourceType === "EXTERNAL_AUDIO") {
+    return item.mediaType === "AUDIO" && trustedArchiveAudioUrl(item.sourceUrl) ? "audio" : null;
   }
   if (item.sourceType !== "LOCAL_FILE") return null;
   if (item.mediaType === "VIDEO") return "video";
@@ -189,6 +193,9 @@ export default function LibraryView() {
                     <div className="library-item-info">
                       <h2>{item.title}</h2>
                       <p>{kind === "youtube" ? "YouTube" : item.mediaType === "VIDEO" ? "Wideo" : item.mediaType === "AUDIO" ? "Audio" : "Materiał"}</p>
+                      {playable ? (
+                        <a className="library-work-link" href={"/nagrania/" + item.id}>Otwórz nagranie z napisami</a>
+                      ) : null}
                       {worksForRecording.length > 0 ? (
                         <div className="library-work-links">
                           {worksForRecording.map((work) => (
@@ -224,7 +231,9 @@ export default function LibraryView() {
                           controlsList="nodownload"
                           autoPlay
                           preload="metadata"
-                          src={`/api/v1/media/${encodeURIComponent(selectedItem.id)}/stream`}
+                          src={selectedItem.sourceType === "EXTERNAL_AUDIO"
+                            ? trustedArchiveAudioUrl(selectedItem.sourceUrl) ?? undefined
+                            : "/api/v1/media/" + encodeURIComponent(selectedItem.id) + "/stream"}
                           aria-label={`Odtwarzanie: ${selectedItem.title}`}
                           onError={() => setPlaybackError(true)}
                         >

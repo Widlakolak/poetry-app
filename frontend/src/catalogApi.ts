@@ -14,6 +14,22 @@ export type MediaRecord = {
   sourceUrl: string | null;
 };
 
+export type TranscriptSegment = {
+  sequenceNumber: number;
+  text: string;
+  startMs: number | null;
+  endMs: number | null;
+};
+
+export type TranscriptRecord = {
+  mediaId: string;
+  languageCode: string | null;
+  fullText: string | null;
+  status: "NOT_AVAILABLE" | "DRAFT" | "VERIFIED";
+  startOffsetMs: number;
+  segments: TranscriptSegment[];
+};
+
 export type RecordingRecord = {
   id: string;
   title: string;
@@ -48,6 +64,23 @@ function isMedia(value: unknown): value is MediaRecord {
     && typeof value.mediaType === "string"
     && typeof value.sourceType === "string"
     && (value.sourceUrl === null || typeof value.sourceUrl === "string");
+}
+
+function isTranscript(value: unknown): value is TranscriptRecord {
+  return isObject(value)
+    && typeof value.mediaId === "string"
+    && (value.languageCode === null || typeof value.languageCode === "string")
+    && (value.fullText === null || typeof value.fullText === "string")
+    && ["NOT_AVAILABLE", "DRAFT", "VERIFIED"].includes(String(value.status))
+    && typeof value.startOffsetMs === "number" && Number.isSafeInteger(value.startOffsetMs)
+    && value.startOffsetMs >= 0
+    && Array.isArray(value.segments)
+    && value.segments.every((segment: unknown) =>
+      isObject(segment)
+      && Number.isSafeInteger(segment.sequenceNumber) && (segment.sequenceNumber as number) >= 0
+      && typeof segment.text === "string"
+      && (segment.startMs === null || (Number.isSafeInteger(segment.startMs) && (segment.startMs as number) >= 0))
+      && (segment.endMs === null || (Number.isSafeInteger(segment.endMs) && (segment.endMs as number) >= 0)));
 }
 
 function isRecording(value: unknown): value is RecordingRecord {
@@ -119,6 +152,24 @@ async function loadAllPages<T>(
 
 export function fetchMedia(signal: AbortSignal): Promise<MediaRecord[]> {
   return loadAllPages("/api/v1/media", isMedia, signal);
+}
+
+export async function fetchMediaById(id: string, signal: AbortSignal): Promise<MediaRecord | null> {
+  const response = await fetch("/api/v1/media/" + encodeURIComponent(id), { signal });
+  if (response.status === 404) return null;
+  if (!response.ok) throw new Error("Media request failed: " + response.status);
+  const payload: unknown = await response.json();
+  if (!isMedia(payload) || payload.id !== id) throw new Error("Invalid media response");
+  return payload;
+}
+
+export async function fetchTranscript(id: string, signal: AbortSignal): Promise<TranscriptRecord | null> {
+  const response = await fetch("/api/v1/media/" + encodeURIComponent(id) + "/transcript", { signal });
+  if (response.status === 404) return null;
+  if (!response.ok) throw new Error("Transcript request failed: " + response.status);
+  const payload: unknown = await response.json();
+  if (!isTranscript(payload) || payload.mediaId !== id) throw new Error("Invalid transcript response");
+  return payload;
 }
 
 export function fetchPoets(signal: AbortSignal): Promise<CreatorRecord[]> {

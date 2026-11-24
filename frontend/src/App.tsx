@@ -14,9 +14,10 @@ import FeaturedVideoCard from "./FeaturedVideoCard";
 import LibraryView from "./LibraryView";
 import PoetsPreview from "./PoetsPreview";
 import RecommendationsRail from "./RecommendationsRail";
+import RecordingPage from "./RecordingPage";
 import SearchView from "./SearchView";
 
-type Page = "home" | "library" | "search" | "editorial";
+type Page = "home" | "library" | "search" | "recording" | "editorial";
 
 type NavigationItem = {
   label: string;
@@ -89,7 +90,7 @@ function BottomNavigation({ currentPage }: { currentPage: Page }) {
 export default function App() {
   const pathname = window.location.pathname;
   const currentPage: Page =
-    pathname === "/" ? "home" : pathname === "/biblioteka" ? "library" : pathname === "/szukaj" ? "search" : "editorial";
+    pathname === "/" ? "home" : pathname === "/biblioteka" ? "library" : pathname === "/szukaj" ? "search" : /^\/nagrania\/[0-9a-fA-F-]{36}\/?$/.test(pathname) ? "recording" : "editorial";
 
   return (
     <div className="app-shell">
@@ -157,6 +158,8 @@ export default function App() {
         <LibraryView />
       ) : currentPage === "search" ? (
         <SearchView />
+      ) : currentPage === "recording" ? (
+        <RecordingPage id={pathname.split("/")[2]} />
       ) : (
         <EditorialPages pathname={pathname} />
       )}
