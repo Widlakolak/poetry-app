@@ -170,7 +170,9 @@ function WorkPage({ slug }: { slug: string }) {
           <ul className="editorial-recordings">
             {work.recordings.map((recording) => (
               <li key={recording.id}>
-                <strong>{recording.title}</strong>
+                <a className="library-work-link" href={"/nagrania/" + recording.id}>
+                  {recording.title} · Odtwórz z napisami
+                </a>
                 <span>{recording.mediaType === "AUDIO" ? "Audio" : recording.mediaType === "VIDEO" ? "Wideo" : "Nagranie"}</span>
               </li>
             ))}
@@ -180,7 +182,7 @@ function WorkPage({ slug }: { slug: string }) {
         )}
         {work.recordings.length > 0 ? (
           <a className="editorial-library-link" href="/biblioteka">
-            <Headphones size={18} aria-hidden="true" /> Przejdź do biblioteki, aby odtworzyć
+            <Headphones size={18} aria-hidden="true" /> Przeglądaj pozostałe nagrania w Bibliotece
           </a>
         ) : null}
       </section>
