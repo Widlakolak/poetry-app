@@ -16,20 +16,21 @@ import PoetsPreview from "./PoetsPreview";
 import RecommendationsRail from "./RecommendationsRail";
 import RecordingPage from "./RecordingPage";
 import SearchView from "./SearchView";
+import { EducationPage, FavoritesPage } from "./EducationPage";
 
-type Page = "home" | "library" | "search" | "recording" | "editorial";
+type Page = "home" | "library" | "search" | "recording" | "editorial" | "education" | "favorites";
 
 type NavigationItem = {
   label: string;
   icon: typeof House;
-  page?: Page;
+  page: Page;
 };
 
 const navigation: NavigationItem[] = [
   { label: "Ekran główny", icon: House, page: "home" },
-  { label: "Edukacja", icon: GraduationCap },
+  { label: "Edukacja", icon: GraduationCap, page: "education" },
   { label: "Biblioteka", icon: LibraryBig, page: "library" },
-  { label: "Ulubione", icon: Heart },
+  { label: "Ulubione", icon: Heart, page: "favorites" },
   { label: "Szukaj", icon: Search, page: "search" },
 ];
 
@@ -70,13 +71,12 @@ function BottomNavigation({ currentPage }: { currentPage: Page }) {
             type="button"
             key={label}
             aria-current={active ? "page" : undefined}
-            disabled={!page}
             onClick={() => {
               if (page) {
-                window.location.assign(page === "home" ? "/" : page === "library" ? "/biblioteka" : "/szukaj");
+                window.location.assign(page === "home" ? "/" : page === "library" ? "/biblioteka" : page === "education" ? "/edukacja" : page === "favorites" ? "/ulubione" : "/szukaj");
               }
             }}
-            title={page ? label : `${label} - kolejny etap`}
+            title={label}
           >
             <Icon size={22} strokeWidth={active ? 2 : 1.7} aria-hidden="true" />
             <span>{label}</span>
@@ -88,9 +88,9 @@ function BottomNavigation({ currentPage }: { currentPage: Page }) {
 }
 
 export default function App() {
-  const pathname = window.location.pathname;
+  const pathname = window.location.pathname.replace(/\/+$/, "") || "/";
   const currentPage: Page =
-    pathname === "/" ? "home" : pathname === "/biblioteka" ? "library" : pathname === "/szukaj" ? "search" : /^\/nagrania\/[0-9a-fA-F-]{36}\/?$/.test(pathname) ? "recording" : "editorial";
+    pathname === "/" ? "home" : pathname === "/biblioteka" ? "library" : pathname === "/szukaj" ? "search" : pathname === "/edukacja" ? "education" : pathname === "/ulubione" ? "favorites" : /^\/nagrania\/[0-9a-fA-F-]{36}\/?$/.test(pathname) ? "recording" : "editorial";
 
   return (
     <div className="app-shell">
@@ -158,6 +158,10 @@ export default function App() {
         <LibraryView />
       ) : currentPage === "search" ? (
         <SearchView />
+      ) : currentPage === "education" ? (
+        <EducationPage />
+      ) : currentPage === "favorites" ? (
+        <FavoritesPage />
       ) : currentPage === "recording" ? (
         <RecordingPage id={pathname.split("/")[2]} />
       ) : (
