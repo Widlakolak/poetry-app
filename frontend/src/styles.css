@@ -1628,18 +1628,277 @@ code {
 }
 
 
-/* Stage 19 follow-up: compact education accordions and language flags. */
-.education-stage summary { display:flex; align-items:center; gap:12px; cursor:pointer; list-style:none; min-height:44px; }
-.education-stage summary::-webkit-details-marker { display:none; }
-.education-stage summary::after { content:"+"; margin-left:auto; font-size:23px; color:var(--olive-dark); }
-.education-stage[open] summary::after { content:"−"; }
-.education-stage summary span { flex:1; min-width:0; }
-.education-stage small { display:block; color:var(--muted); margin-top:4px; }
-.education-stage h3 { font-size:15px; margin:20px 0 9px; }
-.education-list { list-style:none; padding:0; margin:0; }
-.education-list li { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:11px 0; border-top:1px solid var(--line); }
-.education-list li span { min-width:0; overflow-wrap:anywhere; }
-.education-list a { flex-shrink:0; color:var(--olive-dark); font-size:13px; text-underline-offset:3px; }
+/* Stage 19.5 — Education: a quiet, book-like page with clear hierarchy. */
+.education-page {
+  --edu-border: #d5d1c1;
+  --edu-accent: #e9eadb;
+  --edu-muted: #5e6255;
+  --edu-ink: #30352a;
+  width: min(100% - 40px, 960px);
+  max-width: 960px;
+  padding-top: 22px;
+  padding-bottom: 10px;
+  color: var(--edu-ink);
+}
+
+.education-page .editorial-back {
+  min-height: 44px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 550;
+}
+
+.education-page .education-hero {
+  padding: 12px 0 23px;
+  border-bottom: 0;
+}
+
+.education-hero .eyebrow {
+  margin-bottom: 9px;
+  color: var(--olive-dark);
+  font-size: 12px;
+  letter-spacing: .15em;
+}
+
+.education-hero h1 {
+  margin: 0 0 8px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(38px, 5vw, 58px);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -.035em;
+}
+
+.education-lead {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(19px, 2.6vw, 24px);
+  line-height: 1.45;
+}
+
+.education-info {
+  margin-bottom: 22px;
+  padding: clamp(16px, 3vw, 24px);
+  border: 1px solid var(--edu-border);
+  border-radius: 15px;
+  background: #eeece0;
+}
+
+.education-info p {
+  max-width: 78ch;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.education-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 22px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.education-sources a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 5px;
+  color: #38442e;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.45;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.education-sources a svg { flex: 0 0 auto; }
+.education-info .education-status {
+  margin-top: 10px;
+  color: var(--edu-muted);
+  font-size: 14px;
+}
+
+.education-stages {
+  display: grid;
+  gap: 12px;
+}
+
+.education-stage {
+  min-width: 0;
+  border: 1px solid var(--edu-border);
+  border-radius: 15px;
+  background: var(--white);
+}
+
+.education-stage[open] { border-color: #b9bea7; }
+
+.education-stage summary {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  min-height: 78px;
+  padding: 17px 20px;
+  border-radius: 14px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.education-stage summary::-webkit-details-marker { display: none; }
+.education-stage summary::marker { content: ""; }
+.education-stage[open] > summary {
+  border-radius: 14px 14px 0 0;
+  border-bottom: 1px solid var(--edu-border);
+  background: var(--edu-accent);
+}
+
+.education-stage-icon, .education-chevron {
+  flex: 0 0 auto;
+  color: var(--olive-dark);
+}
+
+.education-chevron { margin-left: auto; }
+.education-stage[open] .education-chevron { transform: rotate(180deg); }
+
+.education-stage-heading {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.education-stage-heading strong {
+  display: block;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(19px, 2.6vw, 24px);
+  font-weight: 700;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.education-stage-heading small {
+  display: block;
+  margin-top: 5px;
+  color: var(--edu-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.education-stage-body {
+  display: grid;
+  gap: 20px;
+  padding: 18px 20px 22px;
+}
+
+.education-group { min-width: 0; }
+.education-group h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 5px;
+  padding: 10px 13px;
+  border-radius: 9px;
+  color: #343f2b;
+  background: var(--edu-accent);
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+.education-group h3 svg { flex: 0 0 auto; }
+
+.education-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 12px;
+}
+
+.education-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 66px;
+  padding: 11px 0;
+}
+
+.education-list li + li { border-top: 1px solid var(--line); }
+.education-entry-label { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.education-entry-label strong {
+  display: block;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 19px;
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.education-entry-label small {
+  display: block;
+  margin-top: 3px;
+  color: var(--edu-muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.education-action {
+  flex: 0 0 auto;
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 12px;
+  border: 1px solid #b5bca5;
+  border-radius: 24px;
+  color: #35442b;
+  background: var(--white);
+  font-size: 14px;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.education-action-play { background: var(--edu-accent); }
+.education-action svg { flex: 0 0 auto; }
+.education-stage summary:focus-visible, .education-action:focus-visible {
+  outline: 3px solid var(--olive-dark);
+  outline-offset: 3px;
+}
+
+@media (hover: hover) {
+  .education-stage:not([open]) summary:hover { background: #f0efe6; }
+  .education-action:hover { background: #dee2cf; }
+}
+
+@media (max-width: 520px) {
+  .education-page { width: calc(100% - 28px); padding-top: 12px; }
+  .education-stage summary { gap: 10px; padding: 14px 12px; }
+  .education-stage-icon { width: 22px; height: 22px; }
+  .education-chevron { width: 18px; height: 18px; }
+  .education-stage-body { padding: 12px 10px 15px; gap: 16px; }
+  .education-group h3 { padding: 10px; gap: 8px; font-size: 15px; }
+  .education-list { padding: 0 4px; }
+  .education-entry-label strong { font-size: 17px; }
+  .education-action { font-size: 13px; padding: 8px 10px; }
+  .education-sources { gap: 0 16px; }
+}
+
+@media (max-width: 360px) {
+  .education-list li { flex-wrap: wrap; gap: 6px; }
+  .education-entry-label { flex-basis: 100%; }
+}
+
+/* Shared navigation: slightly stronger contrast, without changing routes. */
+.nav-item { color: #65665c; cursor: pointer; }
+.nav-item-active { color: var(--olive-dark); background: #e9e8dd; }
+.nav-item-active span { font-weight: 700; }
+.nav-item span { font-size: clamp(10px, 2.4vw, 12px); }
+
+@media (max-width: 360px) {
+  .bottom-navigation { gap: 2px; padding-inline: max(5px, env(safe-area-inset-left)); }
+  .nav-item { flex: 1 1 0; min-width: 0; }
+  .nav-item span { font-size: 9px; }
+}
+
+/* Stage 19 follow-up: language flags. */
 .caption-language-picker { display:flex; gap:9px; margin:14px 0; align-items:center; }
 .caption-flag { display:grid; place-items:center; padding:7px; border:1px solid var(--line); border-radius:9px; background:var(--white); min-width:48px; min-height:44px; cursor:pointer; }
 .caption-flag svg { display:block; width:30px; height:20px; border-radius:2px; }
