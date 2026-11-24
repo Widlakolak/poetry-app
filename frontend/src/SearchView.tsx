@@ -12,6 +12,7 @@ import {
 } from "./catalogApi";
 import { youtubeVideoId } from "./youtubeSource";
 import YouTubeEmbed from "./YouTubeEmbed";
+import { trustedArchiveAudioUrl } from "./playbackSource";
 
 type SearchCatalog = {
   media: MediaRecord[];
@@ -43,6 +44,9 @@ function matches(query: string, ...fields: string[]): boolean {
 function playbackKind(item: MediaRecord): PlaybackKind | null {
   if (item.sourceType === "YOUTUBE") {
     return item.mediaType === "VIDEO" && youtubeVideoId(item.sourceUrl) ? "youtube" : null;
+  }
+  if (item.sourceType === "EXTERNAL_AUDIO") {
+    return item.mediaType === "AUDIO" && trustedArchiveAudioUrl(item.sourceUrl) ? "audio" : null;
   }
   if (item.sourceType !== "LOCAL_FILE") return null;
   if (item.mediaType === "AUDIO") return "audio";
@@ -181,6 +185,7 @@ export default function SearchView() {
                             {kind === "youtube" ? "YOUTUBE" : item.mediaType === "AUDIO" ? "AUDIO" : "WIDEO"}
                           </span>
                           <h3>{item.title}</h3>
+                          {kind ? <a className="library-work-link" href={"/nagrania/" + item.id}>Otwórz z napisami</a> : null}
                         </div>
                         {kind ? (
                           <button
@@ -210,7 +215,9 @@ export default function SearchView() {
                               controlsList="nodownload"
                               autoPlay
                               preload="metadata"
-                              src={"/api/v1/media/" + encodeURIComponent(item.id) + "/stream"}
+                              src={item.sourceType === "EXTERNAL_AUDIO"
+                                ? trustedArchiveAudioUrl(item.sourceUrl) ?? undefined
+                                : "/api/v1/media/" + encodeURIComponent(item.id) + "/stream"}
                               aria-label={"Odtwarzanie: " + item.title}
                               onError={() => setPlaybackError(true)}
                             >
